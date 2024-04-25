@@ -7116,53 +7116,6 @@ body.true--mobile .simple-keyboard--with-mic .simple-keyboard-buttons {
      -moz-border-radius: 0.3em;
           border-radius: 0.3em;
 }
-.notice__author {
-  display: -webkit-box;
-  display: -webkit-flex;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: flex;
-  margin-top: 1.5em;
-  -webkit-box-align: start;
-  -webkit-align-items: flex-start;
-     -moz-box-align: start;
-      -ms-flex-align: start;
-          align-items: flex-start;
-}
-.notice__author-img {
-  -webkit-border-radius: 1.1em;
-     -moz-border-radius: 1.1em;
-          border-radius: 1.1em;
-  overflow: hidden;
-  -webkit-flex-shrink: 0;
-      -ms-flex-negative: 0;
-          flex-shrink: 0;
-  background: rgba(0, 0, 0, 0.3);
-  -webkit-transition: background 0.2s;
-  -o-transition: background 0.2s;
-  -moz-transition: background 0.2s;
-  transition: background 0.2s;
-}
-.notice__author-img img {
-  width: 4em;
-  height: 4em;
-  opacity: 0;
-  -webkit-transition: opacity 0.2s;
-  -o-transition: opacity 0.2s;
-  -moz-transition: opacity 0.2s;
-  transition: opacity 0.2s;
-}
-.notice__author-body {
-  padding-left: 1.5em;
-  line-height: 1.4;
-}
-.notice__author-name {
-  font-size: 1.1em;
-  font-weight: 500;
-}
-.notice__author-text {
-  font-size: 1.2em;
-}
 .notice--card {
   display: -webkit-box;
   display: -webkit-flex;

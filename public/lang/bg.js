@@ -1069,11 +1069,6 @@ export default {
     title_reset: 'Рестартирайте',
     back_to_card: 'Връщане към картата',
 
-    premiere_author_recomend_1: 'Поръчайте пица и се пригответе за забава',
-    premiere_author_recomend_2: 'Вечеринката тъкмо започва',
-    premiere_author_recomend_3: 'Бъдете готови за адреналина.',
-    premiere_author_recomend_4: 'Готови ли сте за една незабравима вечер?',
-    premiere_author_recomend_5: 'Препоръчвам ви да гледате',
     premiere_title: 'Премиера',
 
     settings_clear_cache_only: 'Изчистен кеш',
