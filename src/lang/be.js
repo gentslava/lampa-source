@@ -147,7 +147,7 @@ export default {
     settings_parser_in_search_descr: 'Паказваць вынікі ў пошуку?',
     settings_parser_timeout_title: 'Таймаўт парсера',
     settings_parser_timeout_descr: 'Час у секундах, які будзе чакацца адказу ад сервера',
-    
+
     settings_player_type: 'Тып плэера',
     settings_player_type_descr: 'Якім плэерам прайграваць',
     settings_player_iptv_type: 'Тып плэера для IPTV',
@@ -544,7 +544,7 @@ export default {
     filter_alt_names: 'Іншыя назвы',
     filter_rating_from: 'ад',
     filter_rating_to: 'да',
-    
+
     filter_lang_af: 'Афрыкаанс',
     filter_lang_ar: 'Арабская',
     filter_lang_az: 'Азербайджанская',
@@ -915,17 +915,17 @@ export default {
     day_7: 'Нядзеля',
 
     month_1_e: 'Студзеня',
-    month_2_e: 'Лютага', 
-    month_3_e: 'Сакавіка', 
-    month_4_e: 'Красавіка', 
-    month_5_e: 'Мая', 
-    month_6_e: 'Чэрвеня', 
-    month_7_e: 'Ліпеня', 
-    month_8_e: 'Жніўня', 
-    month_9_e: 'Верасня', 
-    month_10_e: 'Кастрычніка', 
-    month_11_e: 'Лістапада', 
-    month_12_e: 'Снежня', 
+    month_2_e: 'Лютага',
+    month_3_e: 'Сакавіка',
+    month_4_e: 'Красавіка',
+    month_5_e: 'Мая',
+    month_6_e: 'Чэрвеня',
+    month_7_e: 'Ліпеня',
+    month_8_e: 'Жніўня',
+    month_9_e: 'Верасня',
+    month_10_e: 'Кастрычніка',
+    month_11_e: 'Лістапада',
+    month_12_e: 'Снежня',
 
     week_1: 'Пн',
     week_2: 'Аў',
@@ -937,7 +937,7 @@ export default {
 
     notice_none_account: 'У вас яшчэ няма ніякіх апавяшчэнняў, дадайце серыялы ў закладкі і чакайце апавяшчэння аб новых серыях.',
     notice_none_system: 'На дадзены момант у вас адсутнічаюць апавяшчэння. Мы абавязкова апавясцім вас, калі з\'явяцца новыя апавяшчэнні.',
-    
+
     extensions_enable: 'Уключыць',
     extensions_disable: 'Адключыць',
     extensions_check: 'Праверыць статус',
@@ -1023,7 +1023,7 @@ export default {
     settings_interface_glass_opacity: 'Празрыстасць шкла',
     torrent_error_check_no_auth: 'Сервер адказаў на запыт, але не ўдалося прайсці аўтарызацыю',
     settings_interface_card_cover: 'Паказаць вокладку',
-    
+
     title_upcoming_episodes: 'Бліжэйшыя выхады эпізодаў',
     settings_rest_cache_images: 'Кэш малюнкаў',
     settings_rest_cache_images_descr: 'Кэшаваць постэры і фоны ў лакальнае сховішча',
@@ -1115,12 +1115,6 @@ export default {
     parental_control_input_code: 'Увядзіце PIN-код',
     parental_control_input_error: 'Вы ўвялі няправільны PIN-код',
     title_worth_rewatch: 'Варта перагледзець',
-
-    ad_disable: 'Падпісаўшыся на CUB Premium, вы забудзецеся аб рэкламе.',
-    ad_after: 'Рэклама праз',
-    ad: 'Рэклама',
-    ad_skip: 'Прапусціць',
-    ad_continue_after: 'Прагляд пачнецца праз',
 
     settings_parser_prowlarr_link_descr: 'Пазначце спасылку на сервер Prowlarr',
     settings_parser_prowlarr_key_descr: 'Знаходзіцца ва ўкладцы налад Prowlarr у катэгорыі асноўнае',

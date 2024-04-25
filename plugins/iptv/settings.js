@@ -32,25 +32,9 @@ function init(){
         '7': '7',
         '14': '14',
     },'3')
-    
+
 
     Lampa.Settings.listener.follow('open', function (e) {
-        if(e.name == 'iptv'){
-            if(!Lampa.Account.hasPremium()){
-                let body = e.body.find('.scroll__body > div')
-
-                let info = $(`<div class="settings-param selector" data-type="button" data-static="true">
-                    <div class="settings-param__name">${Lampa.Lang.translate('account_premium_more')}</div>
-                    <div class="settings-param__descr">${Lampa.Lang.translate('iptv_premium')}</div>
-                </div>`)
-
-                info.on('hover:enter',Lampa.Account.showCubPremium)
-
-                body.prepend('<div class="settings-param-title"><span>'+Lampa.Lang.translate('title_settings')+'</span></div>')
-
-                body.prepend(info)
-            }
-        }
         if(e.name == 'iptv_guide'){
             let status = e.body.find('.update-guide-status')
             let parser = window.iptv_guide_update_process
@@ -209,16 +193,10 @@ function init(){
         field: {
             name: Lampa.Lang.translate('iptv_param_sort_favorite'),
         },
-        onRender: (item)=>{
-            if(!Lampa.Account.hasPremium()){
-                item.removeClass('selector')
-                
-                item.append(Lampa.Template.get('cub_iptv_param_lock'))
-            }
+        onRender: ()=>{
+
         },
-        onChange: ()=>{
-            
-        }
+        onChange: ()=>{}
     })
 }
 

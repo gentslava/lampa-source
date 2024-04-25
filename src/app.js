@@ -1,5 +1,3 @@
-import Define from './utils/define'
-import PromisePolyfill from './utils/promise-polyfill'
 import Manifest from './utils/manifest'
 import Lang from './utils/lang'
 import Platform from './utils/platform'
@@ -77,7 +75,6 @@ import Developer from './interaction/developer'
 import DeviceInput from './utils/device_input'
 import AppWorker from './utils/worker'
 import Theme from './utils/theme'
-import AdManager from './interaction/ad/manager'
 import DB from './utils/db'
 import NavigationBar from './interaction/navigation_bar'
 import Endless from './interaction/endless'
@@ -422,7 +419,6 @@ function startApp(){
     Parser.init()
     WebOSLauncher.init()
     Theme.init()
-    AdManager.init()
     NavigationBar.init()
     Demo.init()
     Speedtest.init()
@@ -618,20 +614,6 @@ function startApp(){
             let name = Storage.field('torrserver_use_link') == 'one' ? 'torrserver_url' : 'torrserver_url_two'
 
             check(name)
-
-            if(!Account.hasPremium() && Lang.selected(['ru','be','uk']) && !Personal.confirm()){
-                let ad = $(`
-                    <div class="ad-server">
-                        <div class="ad-server__text">
-                            Арендовать ссылку на сервер без установки и настроек.
-                        </div>
-                        <img src="https://i.ibb.co/VWSW4KG/qr-code-1.png" class="ad-server__qr">
-                        <div class="ad-server__label">Реклама - https://tsarea.us</div>
-                    </div>
-                `)
-
-                $('[data-name="torrserver_use_link"]',e.body).after(ad)
-            }
         }
         else torrent_net.clear()
 

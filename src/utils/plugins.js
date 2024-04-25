@@ -46,7 +46,7 @@ function modify(){
     })
 
     console.log('Plugins','modify:', list)
-    
+
     Storage.set('plugins', list)
 }
 
@@ -95,49 +95,45 @@ function save(){
 }
 
 function updatePluginDB(name, url){
-    if(Account.hasPremium()){
-        _network.native(url,(str)=>{
-            Cache.rewriteData('plugins', name, str).then(()=>{
-                console.log('Plugins','update plugin cache:', name)
-            }).catch((e)=>{
-                console.log('Plugins','add to cache fail:', name, typeof e == 'string' ? e : e ? e.message : 'no details')
-            })
-        },false,false,{
-            dataType: 'text'
+    _network.native(url,(str)=>{
+        Cache.rewriteData('plugins', name, str).then(()=>{
+            console.log('Plugins','update plugin cache:', name)
+        }).catch((e)=>{
+            console.log('Plugins','add to cache fail:', name, typeof e == 'string' ? e : e ? e.message : 'no details')
         })
-    }
+    },false,false,{
+        dataType: 'text'
+    })
 }
 
 function createPluginDB(name){
-    if(Account.hasPremium()){
-        Cache.getData('plugins',name).then(code=>{
-            if(code){
-                let s = document.createElement('script')
-                    s.type = 'text/javascript'
-                
-                try {
-                    s.appendChild(document.createTextNode(code))
-                    document.body.appendChild(s)
-                } 
-                catch (e) {
-                    s.text = code
-                    document.body.appendChild(s)
-                }
+    Cache.getData('plugins',name).then(code=>{
+        if(code){
+            let s = document.createElement('script')
+                s.type = 'text/javascript'
 
-                console.log('Plugins','add plugin from cache:', name)
+            try {
+                s.appendChild(document.createTextNode(code))
+                document.body.appendChild(s)
             }
-            else console.log('Plugins','no find in cache:', name)
-        }).catch(e=>{
-            console.log('Plugins','include from cache fail:', name, typeof e == 'string' ? e : e.message)
-        })
-    }
+            catch (e) {
+                s.text = code
+                document.body.appendChild(s)
+            }
+
+            console.log('Plugins','add plugin from cache:', name)
+        }
+        else console.log('Plugins','no find in cache:', name)
+    }).catch(e=>{
+        console.log('Plugins','include from cache fail:', name, typeof e == 'string' ? e : e.message)
+    })
 }
 
 function addPluginParams(url){
     let encode = url
 
     encode = encode.replace('cub.watch', Manifest.cub_domain)
-        
+
     if(!/[0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}[.][0-9]{1,3}/.test(encode)){
         encode = encode.replace(/\{storage_(\w+|\d+|_|-)\}/g,(match,key)=>{
             return encodeURIComponent(Base64.encode(localStorage.getItem(key) || ''))
@@ -215,7 +211,7 @@ function load(call){
             puts = puts.filter((element, index) => {
                 return puts.indexOf(element) === index
             })
-            
+
             console.log('Plugins','load list:', puts)
 
             black_list.push('lipp.xyz')
@@ -229,7 +225,7 @@ function load(call){
             black_list.push('4pda.')
             black_list.push('teletype.in')
             black_list.push('yotube.com')
-            
+
             _blacklist = black_list
 
             console.log('Plugins','black list:', black_list)

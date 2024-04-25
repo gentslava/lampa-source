@@ -18,9 +18,8 @@ import Noty from '../interaction/noty'
 import Lang from '../utils/lang'
 import Arrays from '../utils/arrays'
 import Background from './background'
-import TV from './player/iptv' 
+import TV from './player/iptv'
 import ParentalControl from './parental_control'
-import Preroll from './ad/preroll'
 
 let html
 let listener = Subscribe()
@@ -283,7 +282,7 @@ function init(){
         if(work && work.timeline){
             work.timeline.continued = false
             work.timeline.continued_bloc = false
-        } 
+        }
     })
 
     /** Нажали на кнопку (отправить) */
@@ -327,7 +326,7 @@ function init(){
             wait_for_loading_url = true
 
             e.item.url(call)
-        } 
+        }
     })
 
     /** Установить название следующей серии */
@@ -338,7 +337,7 @@ function init(){
         if(preloader.wait){
             let pb = e.data.preloaded_bytes || 0,
                 ps = e.data.preload_size || 0
-            
+
             let progress = Math.min(100,((pb * 100) / ps ))
 
             Panel.update('timenow',Math.round(progress) + '%')
@@ -476,13 +475,13 @@ function destroy(){
 
 /**
  * Запустить webos плеер
- * @param {Object} params 
+ * @param {Object} params
  */
 function runWebOS(params){
     webOS.service.request("luna://com.webos.applicationManager", {
         method: "launch",
-        parameters: { 
-            "id": params.need, 
+        parameters: {
+            "id": params.need,
             "params": {
                 "payload":[
                     {
@@ -529,8 +528,8 @@ function runWebOS(params){
 
 /**
  * Показать предзагрузку торрента
- * @param {Object} data 
- * @param {Function} call 
+ * @param {Object} data
+ * @param {Function} call
  */
 function preload(data, call){
     data.url = data.url.replace('&preload','&play')
@@ -544,7 +543,7 @@ function preload(data, call){
 function ask(){
     if(work && work.timeline && work.timeline.percent){
         work.timeline.waiting_for_user = false
-        
+
         if(Storage.field('player_timecode') == 'ask'){
             work.timeline.waiting_for_user = true
 
@@ -573,7 +572,7 @@ function ask(){
                     if(!a.yes){
                         work.timeline.continued = true
                         work.timeline.continued_bloc = true
-                    } 
+                    }
 
                     toggle()
 
@@ -588,7 +587,7 @@ function ask(){
                 work.timeline.continued_bloc = true
 
                 Select.hide()
-                
+
                 toggle()
             },8000)
         }
@@ -635,7 +634,7 @@ function start(data, need, inner){
 	    else if(Storage.field(player_need) == 'svplayer')window.open('svplayer://x-callback-url/stream?url='+encodeURIComponent(data.url))
         else if(Storage.field(player_need) == 'ios'){
             html.addClass('player--ios')
-			
+
             inner()
         }
         else inner()
@@ -651,15 +650,13 @@ function start(data, need, inner){
     else if(Platform.is('webos') && (Storage.field(player_need) == 'webos' || launch_player == 'webos')){
         data.url = data.url.replace('&preload','&play')
 
-        Preroll.show(data,()=>{
-            runWebOS({
-                need: 'com.webos.app.photovideo',
-                url: data.url,
-                name: data.path || data.title,
-                position: data.timeline ? (data.timeline.time || -1) : -1
-            })
+        runWebOS({
+            need: 'com.webos.app.photovideo',
+            url: data.url,
+            name: data.path || data.title,
+            position: data.timeline ? (data.timeline.time || -1) : -1
         })
-    } 
+    }
     else if(Platform.is('android') && (Storage.field(player_need) == 'android' || launch_player == 'android' || data.torrent_hash)){
         data.url = data.url.replace('&preload','&play')
 
@@ -681,13 +678,13 @@ function start(data, need, inner){
 
         data.url = data.url.replace('&preload','&play').replace(/\s/g,'%20')
 
-        if (file.existsSync(path)) { 
+        if (file.existsSync(path)) {
             Preroll.show(data,()=>{
                 let spawn = require('child_process').spawn
 
                 spawn(path, [data.url])
             })
-        } 
+        }
         else{
             Noty.show(Lang.translate('player_not_found') + ': ' + path)
         }
@@ -697,7 +694,7 @@ function start(data, need, inner){
 
 /**
  * Запустить плеер
- * @param {Object} data 
+ * @param {Object} data
  */
 function play(data){
     console.log('Player','url:',data.url)
@@ -708,7 +705,7 @@ function play(data){
             for(let q in data.quality){
                 if(parseInt(q) == Storage.field('video_quality_default')){
                     data.url = data.quality[q]
-    
+
                     break
                 }
             }
@@ -745,7 +742,7 @@ function play(data){
                 if(data.subtitles) Video.customSubs(data.subtitles)
 
                 Info.set('name',data.title)
-                
+
                 if(!preloader.call) $('body').append(html)
 
                 toggle()
@@ -800,7 +797,7 @@ function iptv(data){
 
 /**
  * Статистика для торрсервера
- * @param {String} url 
+ * @param {String} url
  */
 function stat(url){
     if(work || preloader.wait) Info.set('stat',url)
@@ -808,7 +805,7 @@ function stat(url){
 
 /**
  * Установить плейлист
- * @param {Array} playlist 
+ * @param {Array} playlist
  */
 function playlist(playlist){
     if(work || preloader.wait) Playlist.set(playlist)
@@ -816,12 +813,12 @@ function playlist(playlist){
 
 /**
  * Установить субтитры
- * @param {Array} subs 
+ * @param {Array} subs
  */
 function subtitles(subs){
     if(work || preloader.wait){
         Video.customSubs(subs)
-    } 
+    }
 }
 
 /**
@@ -834,7 +831,7 @@ function runas(need){
 
 /**
  * Обратный вызов
- * @param {Function} back 
+ * @param {Function} back
  */
 function onBack(back){
     callback = back

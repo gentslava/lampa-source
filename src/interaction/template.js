@@ -99,8 +99,6 @@ import feed_head from '../templates/feed/head'
 import feed_episode from '../templates/feed/episode'
 import register from '../templates/register'
 import speedtest from '../templates/speedtest'
-import ad_bot from '../templates/ad/bot'
-import ad_video_block from '../templates/ad/video'
 
 let templates = {
     head,
@@ -202,12 +200,9 @@ let templates = {
     season_episode,
     season_episode_rate,
     season_info,
-    ad_bot,
-    ad_video_block
 }
 
 let created = {}
-let cloned  = {}
 
 function get(name, vars = {}, like_static = false){
     let tpl = templates[name]
@@ -271,7 +266,7 @@ function js(name, vars){
 
             return data
         }
-        
+
         let tree = extract(tpl[0])
 
         created[name] = tree

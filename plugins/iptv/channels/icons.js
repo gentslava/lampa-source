@@ -13,7 +13,7 @@ class Icons{
         this.html.addClass('iptv-channels')
 
         this.scroll.append(this.html)
-        
+
         if(!window.iptv_mobile) this.scroll.minus()
 
         this.scroll.onEnd = ()=>{
@@ -29,7 +29,7 @@ class Icons{
                 this.icons.sort((a,b)=>{
                     let ta = a.added || 0
                     let tb = b.added || 0
-    
+
                     return ta < tb ? -1 : ta > tb ? 1 : 0
                 })
 
@@ -64,7 +64,7 @@ class Icons{
     sort(){
         let sort_type = Lampa.Storage.field('iptv_favotite_sort')
 
-        if(Lampa.Account.hasPremium() && sort_type !== 'add'){
+        if(sort_type !== 'add'){
             this.icons.sort((a,b)=>{
                 if(sort_type == 'name'){
                     return a.name < b.name ? -1 : a.name > b.name ? 1 : 0
@@ -142,7 +142,7 @@ class Icons{
                     body.append(simb)
                     body.append(text)
                 }
-    
+
                 img.onload = function(){
                     item.addClass('loaded')
 

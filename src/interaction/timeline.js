@@ -61,7 +61,7 @@ function update(params){
 
     listener.send('update', {data:{ hash: params.hash, road }})
 
-    if(!params.received && Account.hasPremium()) Socket.send('timeline',{params})
+    if(!params.received) Socket.send('timeline',{params})
 }
 
 function view(hash){

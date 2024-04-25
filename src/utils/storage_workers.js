@@ -29,7 +29,7 @@ class WorkerArray{
         console.log('StorageWorker', this.field, 'start follow')
 
         Storage.listener.follow('change',(e)=>{
-            if(this.field == e.name && this.loaded && Account.canSync() && Account.hasPremium()){
+            if(this.field == e.name && this.loaded && Account.canSync()){
                 try{
                     this.save(e.value)
                 }
@@ -110,7 +110,7 @@ class WorkerArray{
     update(full, nolisten){
         let account = Account.canSync()
 
-        if(account && Account.hasPremium()){
+        if (account) {
             console.log('StorageWorker',this.field,'update start')
 
             let url = api + 'storage/data/'+encodeURIComponent(this.field) + '/' + this.class_type
@@ -159,8 +159,6 @@ class WorkerArray{
     }
 
     send(id,value){
-        if(!Account.hasPremium()) return
-
         console.log('StorageWorker','save:',this.field, id,value)
 
         let str = JSON.stringify(value)
@@ -269,10 +267,10 @@ class WorkerFilterID extends WorkerArray {
                 this.data.push(typeof val == 'object' ? Arrays.clone(val) : val)
 
                 uniq.push(val)
-            } 
+            }
             else if(JSON.stringify(val) !== JSON.stringify(find)){
                 this.data[this.data.indexOf(find)] = typeof val == 'object' ? Arrays.clone(val) : val
-                
+
                 uniq.push(val)
             }
         })
@@ -294,7 +292,7 @@ class WorkerFilterID extends WorkerArray {
 class WorkerObject extends WorkerArray {
     constructor(params){
         super(params)
-        
+
         this.data  = {}
         this.empty = {}
     }

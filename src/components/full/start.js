@@ -100,7 +100,7 @@ function create(data, params = {}){
 
         if(quality){
             html.find('.tag--quality').removeClass('hide').find('> div').text(quality)
-            
+
             info.push('<span>'+Lang.translate('player_quality')+': '+quality.toUpperCase()+'</span>')
         }
 
@@ -162,7 +162,7 @@ function create(data, params = {}){
                 $('.tag--episode',html).removeClass('hide').find('div').text(txt)
 
                 info.push('<span>'+txt+'</span>')
-            } 
+            }
         }
 
         if(data.movie.status){
@@ -212,7 +212,7 @@ function create(data, params = {}){
         if(!new_html){
             buttons_scroll.render().find('.selector').on('hover:focus',function(){
                 last = $(this)[0]
-    
+
                 buttons_scroll.update($(this), false)
             })
         }
@@ -221,7 +221,7 @@ function create(data, params = {}){
                 last = $(this)[0]
             })
         }
-        
+
         html.find('.full-start-new__head').toggleClass('hide',!head.length).html(head.join(', '))
         html.find('.full-start-new__details').html(info.join('<span class="full-start-new__split">●</span>'))
 
@@ -244,7 +244,7 @@ function create(data, params = {}){
         let pg = Api.sources.tmdb.parsePG(data.movie)
 
         if(pg) html.find('.full-start__pg').removeClass('hide').text(pg)
-        
+
         if(window.lampa_settings.read_only) html.find('.button--play').remove()
     }
 
@@ -253,7 +253,7 @@ function create(data, params = {}){
         let clon = btn.clone()
 
         cont.find('.button--priority').remove()
-        
+
         clon.addClass('button--priority').removeClass('view--torrent').on('hover:enter',()=>{
             btn.trigger('hover:enter')
         }).on('hover:long',()=>{
@@ -275,7 +275,7 @@ function create(data, params = {}){
 
         if(!mine[id]) mine[id] = []
 
-        let ready = mine[id].indexOf(type) >= 0 
+        let ready = mine[id].indexOf(type) >= 0
 
         if(add){
             if(!ready) mine[id].push(type)
@@ -293,36 +293,36 @@ function create(data, params = {}){
             if(data.reactions && data.reactions.result && data.reactions.result.length){
                 let reactions = data.reactions.result
                 let reactions_body = html.find('.full-start-new__reactions')[0]
-    
+
                 reactions.sort((a,b)=>{
                     return a.counter > b.counter ? -1 : a.counter < b.counter ? 1 : 0
                 })
 
                 reactions_body.empty()
-    
+
                 reactions.forEach(r=>{
                     let reaction = document.createElement('div'),
                         icon     = document.createElement('img'),
                         count    = document.createElement('div'),
                         wrap     = document.createElement('div')
-    
+
                     reaction.addClass('reaction')
                     icon.addClass('reaction__icon')
                     count.addClass('reaction__count')
-    
+
                     reaction.addClass('reaction--' + r.type)
-    
+
                     count.text(Utils.bigNumberToShort(r.counter))
-    
+
                     icon.src = Utils.protocol() + Manifest.cub_domain + '/img/reactions/' + r.type + '.svg'
-    
+
                     reaction.append(icon)
                     reaction.append(count)
-    
+
                     wrap.append(reaction)
-    
+
                     if(this.vote(r.type)) reaction.addClass('reaction--voted')
-    
+
                     reactions_body.append(wrap)
                 })
             }
@@ -438,7 +438,7 @@ function create(data, params = {}){
                     type: m,
                     picked: status[m],
                     collect: true,
-                    noenter: !Account.hasPremium()
+                    noenter: false
                 })
             })
 
@@ -450,22 +450,7 @@ function create(data, params = {}){
                 onBack: ()=>{
                     Controller.toggle('full_start')
                 },
-                onDraw: (item, elem)=>{
-                    if(elem.collect){
-                        if(!Account.hasPremium()){
-                            let wrap = $('<div class="selectbox-item__lock"></div>')
-                                wrap.append(Template.js('icon_lock'))
-
-                            item.append(wrap)
-
-                            item.on('hover:enter', ()=>{
-                                Select.close()
-
-                                Account.showCubPremium()
-                            })
-                        }
-                    }
-                }
+                onDraw: ()=>{}
             })
         })
     }
@@ -475,10 +460,10 @@ function create(data, params = {}){
         let btns = html.find('.buttons--container > .full-start__button').not('.hide')
 
         let priority = Storage.get('full_btn_priority','') + ''
-        
+
         if(priority){
             let priority_button
-            
+
             btns.each(function(){
                 let hash = Utils.hash($(this).clone().removeClass('focus').prop('outerHTML'))
 
@@ -488,7 +473,7 @@ function create(data, params = {}){
             if(priority_button) this.setBtnInPriority(priority_button)
         }
 
-        
+
         play.unbind().on('hover:enter',(e)=>{
             priority = Storage.get('full_btn_priority','') + ''
 
@@ -522,7 +507,7 @@ function create(data, params = {}){
                     },
                     onLong: (a)=>{
                         Storage.set('full_btn_priority',Utils.hash(a.btn.clone().removeClass('focus').prop('outerHTML')))
-                        
+
                         this.setBtnInPriority(a.btn)
                     },
                     onBack: ()=>{
@@ -533,8 +518,8 @@ function create(data, params = {}){
         }).on('hover:focus',function(){
             last = $(this)[0]
         })
-        
-        
+
+
         play.toggleClass('hide',!Boolean(btns.length))
     }
 
@@ -620,7 +605,7 @@ function create(data, params = {}){
 
     this.translations = function(){
         let button = html.find('.button--subscribe')
-        
+
         button.on('hover:enter',()=>{
             Loading.start(()=>{
                 event.cancel('translations')
@@ -634,7 +619,7 @@ function create(data, params = {}){
                 season: Utils.countSeasons(data.movie)
             },(result)=>{
                 Loading.stop()
-                
+
                 if(!result.result){
                     result.result = {
                         voice: {},
@@ -702,7 +687,7 @@ function create(data, params = {}){
                     })
                 }
                 else Noty.show(Lang.translate('subscribe_noinfo'))
-                
+
             })
         })
     }
@@ -748,7 +733,7 @@ function create(data, params = {}){
             update: ()=>{},
             toggle: ()=>{
                 this.groupButtons()
-                
+
                 let btns = html.find('.full-start__buttons > *').filter(function(){
                     return $(this).is(':visible')
                 })

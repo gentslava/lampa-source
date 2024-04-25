@@ -14,7 +14,6 @@ import DeviceInput from '../../utils/device_input'
 import Orsay from './orsay'
 import YouTube from './youtube'
 import TV from './iptv'
-import AD from '../ad/player'
 
 let listener = Subscribe()
 let html
@@ -62,7 +61,7 @@ function init(){
     html.on('click',(e)=>{
         if((Storage.field('navigation_type') == 'mouse' || Utils.isTouchDevice()) && DeviceInput.canClick(e.originalEvent)){
             clearTimeout(click_timer)
-            
+
             click_nums++
 
             if(TV.playning()) click_nums = 1
@@ -86,13 +85,13 @@ function init(){
                     else{
                         backworkIcon.addClass('rewind').find('span').text('-' + pow + ' sec')
                     }
-                    
+
                     to(video.currentTime + dir * pow)
 
                     click_nums = 0
                 }, 300)
             }
-        } 
+        }
     })
 
     let time_resize
@@ -103,11 +102,11 @@ function init(){
         time_resize = setTimeout(()=>{
             if(video){
                 neeed_sacle = neeed_sacle_last
-    
+
                 scale()
 
                 if(video.resize) video.resize()
-            } 
+            }
         },200)
     })
 
@@ -130,7 +129,7 @@ function webosLoadSubs(){
     let subs = webos_wait.subs
 
     video.webos_subs = subs
-    
+
     let inx = params.sub + 1
 
     if(typeof params.sub !== 'undefined' && subs[inx]){
@@ -147,7 +146,7 @@ function webosLoadSubs(){
         let full = subs.find(s=>(s.label || '').indexOf('олные') >= 0)
 
         subs[0].selected = false
-         
+
         if(full){
             full.mode     = 'showing'
             full.selected = true
@@ -156,7 +155,7 @@ function webosLoadSubs(){
             subs[1].mode     = 'showing'
             subs[1].selected = true
         }
-        
+
         subsview(true)
     }
 }
@@ -217,7 +216,7 @@ function bind(){
             else if(typeof error.code !== 'undefined'){
                 listener.send('error', {error: 'code ['+error.code+'] details ['+msg+']', fatal: true})
             }
-        } 
+        }
     })
 
     // прогресс буферизации
@@ -380,7 +379,7 @@ function mutation(){
 
 /**
  * Конвертировать object to array
- * @param {object[]} arr 
+ * @param {object[]} arr
  * @returns {array}
  */
 function convertToArray(arr){
@@ -453,7 +452,7 @@ function scale(){
 
     sx = sx.toFixed(2)
     sy = sy.toFixed(2)
-    
+
     if((Platform.is('orsay') && Storage.field('player') == 'inner') || Storage.field('player_scale_method') == 'calculate'){
         var nw = vw * rt,
             nh = vh * rt
@@ -472,7 +471,7 @@ function scale(){
             transform: sx == 1.00 ? 'unset' : 'scaleX('+sx+') scaleY('+sy+')'
         }
     }
-    
+
     $(video).css(sz)
 
     neeed_sacle = false
@@ -502,7 +501,7 @@ function saveParams(){
         for(let i = 0; i < subs.length; i++){
             if(subs[i].enabled == true || subs[i].selected == true){
                 params.sub = subs[i].index
-            } 
+            }
         }
     }
 
@@ -523,7 +522,7 @@ function clearParamas(){
 
 /**
  * Загрузитьновое состояние из прошлого
- * @param {{sub:integer, track:integer, level:integer}} saved_params 
+ * @param {{sub:integer, track:integer, level:integer}} saved_params
  */
 function setParams(saved_params){
     params = saved_params
@@ -552,7 +551,7 @@ function loaded(){
                 },
                 get: ()=>{}
             })
-        }) 
+        })
     }
     else if(dash){
         tracks = dash.getTracksFor('audio')
@@ -579,7 +578,7 @@ function loaded(){
 
         if(webos_wait.tracks) webosLoadTracks()
         if(webos_wait.subs)   webosLoadSubs()
-    } 
+    }
 
     if(tracks.length){
         tracks = convertToArray(tracks)
@@ -598,7 +597,7 @@ function loaded(){
 
     if(subs.length){
         subs = convertToArray(subs)
-        
+
         if(typeof params.sub !== 'undefined' && subs[params.sub]){
             subs.forEach(e=>{e.mode = 'disabled'; e.selected = false})
 
@@ -609,7 +608,7 @@ function loaded(){
         }
         else if(Storage.field('subtitles_start')){
             let full = subs.find(s=>(s.label || '').indexOf('олные') >= 0)
-             
+
             if(full){
                 full.mode     = 'showing'
                 full.selected = true
@@ -618,7 +617,7 @@ function loaded(){
                 subs[0].mode     = 'showing'
                 subs[0].selected = true
             }
-            
+
             subsview(true)
         }
 
@@ -635,7 +634,7 @@ function loaded(){
                 current_level  = level.title
 
                 level.selected = true
-            } 
+            }
 
             Object.defineProperty(level, "enabled", {
                 set: (v)=>{
@@ -668,7 +667,7 @@ function loaded(){
 
     if(dash){
         let bitrates = dash.getBitrateInfoListFor("video"),current_level = 'AUTO'
-        
+
         bitrates.forEach((level, i)=>{
             level.title = level.width ? level.width + 'x' + level.height : 'AUTO'
 
@@ -680,7 +679,7 @@ function loaded(){
                         dash.getSettings().streaming.abr.autoSwitchBitrate = false
 
                         dash.setQualityFor("video", level.qualityIndex)
-                    } 
+                    }
                 },
                 get: ()=>{}
             })
@@ -696,7 +695,7 @@ function loaded(){
 
             current_level = bitrates[params.level].title
         }
-        
+
         listener.send('levels', {levels: bitrates, current: current_level})
     }
 }
@@ -704,7 +703,7 @@ function loaded(){
 
 /**
  * Установить собственные субтитры
- * @param {[{index:integer, label:string, url:string}]} subs 
+ * @param {[{index:integer, label:string, url:string}]} subs
  */
 function customSubs(subs){
     video.customSubs = Arrays.clone(subs)
@@ -743,7 +742,7 @@ function customSubs(subs){
 
 /**
  * Включить или выключить субтитры
- * @param {boolean} status 
+ * @param {boolean} status
  */
 function subsview(status){
     subtitles.toggleClass('hide', !status)
@@ -774,7 +773,7 @@ function applySubsSettings() {
  */
 function create(){
     let videobox
-    
+
     if(Platform.is('tizen') && Storage.field('player') == 'tizen'){
         videobox = Tizen((object)=>{
             video = object
@@ -855,7 +854,7 @@ function normalizationVisible(status){
 
 /**
  * Показать згразку или нет
- * @param {boolean} status 
+ * @param {boolean} status
  */
 function loader(status){
     wait = status
@@ -865,7 +864,7 @@ function loader(status){
 
 /**
  * Устанавливаем ссылку на видео
- * @param {string} src 
+ * @param {string} src
  */
  function url(src, change_quality){
     loader(true)
@@ -921,7 +920,7 @@ function loader(status){
             console.log('Player','use program hls:', use_program)
 
             if(!Platform.is('tizen')) console.log('Player', 'can play vnd.apple.mpegurl', video.canPlayType('application/vnd.apple.mpegurl') ? true : false)
-            
+
             //погнали
             if(use_program){
                 hls = new Hls()
@@ -1001,7 +1000,7 @@ function loader(status){
 
 /**
  * Начать загрузку
- * @param {string} src 
+ * @param {string} src
  */
 function load(src){
     if(hls_parser){
@@ -1023,8 +1022,6 @@ function load(src){
  * Играем
  */
 function play(){
-    if(AD.launched()) return
-    
     var playPromise;
 
     try{
@@ -1082,7 +1079,7 @@ function playpause(){
         play()
 
         listener.send('play', {})
-    }  
+    }
     else{
         pause()
 
@@ -1184,8 +1181,8 @@ function speed(value){
 }
 
 /**
- * Перемотка на позицию 
- * @param {number} type 
+ * Перемотка на позицию
+ * @param {number} type
  */
 function to(seconds){
     pause()
@@ -1227,11 +1224,11 @@ function destroy(savemeta){
     subsview(false)
 
     neeed_sacle = false
-    
+
     if(render_trigger){
         render_trigger.remove()
         render_trigger = false
-    } 
+    }
 
     paused.addClass('hide')
 

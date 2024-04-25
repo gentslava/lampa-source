@@ -57,8 +57,6 @@ function create(data, params = {}){
 
             subscribed = subscribes.find(a=>a == data.id)
 
-            if(!subscribed && !Account.hasPremium()) return Account.showCubPremium()
-
             let account = Account.logged() ? Storage.get('account','{}') : false
 
             if(!account) return Account.showNoAccount()

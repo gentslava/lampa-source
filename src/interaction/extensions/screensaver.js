@@ -69,10 +69,8 @@ class Screensaver extends Item{
                 Controller.toggle(controller)
 
                 if(a.toggle){
-                    if(this.active()) Storage.set('cub_screensaver','')
-                    else{
-                        if(this.data.premium && !Account.hasPremium()) return Lampa.Account.showCubPremium()
-
+                    if (this.active()) Storage.set('cub_screensaver','')
+                    else {
                         Storage.set('cub_screensaver',this.link)
                         Storage.set('screensaver_type','cub')
                     }
