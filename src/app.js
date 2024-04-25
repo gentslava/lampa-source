@@ -501,7 +501,7 @@ function startApp(){
 
     /** Активируем последнию активность */
 
-    setTimeout(Activity.last.bind(Activity),500)
+    setTimeout(Activity.last.bind(Activity),0)
 
     /** Гасим свет :D */
 
@@ -513,7 +513,7 @@ function startApp(){
         $('.welcome').fadeOut(500,()=>{
             $(this).remove()
         })
-    },1000)
+    },0)
 
 
     /** End */
