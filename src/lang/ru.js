@@ -1102,11 +1102,6 @@ export default {
 
     https_text: 'Вы используйте протокол HTTPS, c которым Lampa работает некорректно. Для корректной работы приложения используйте адрес с протоколом HTTP',
 
-    premiere_author_recomend_1: 'Закажите пиццу и готовьтесь к драйву.',
-    premiere_author_recomend_2: 'Вечеринка только начинается.',
-    premiere_author_recomend_3: 'Подготовьтесь к адреналину.',
-    premiere_author_recomend_4: 'Готовы к незабываемому вечеру?',
-    premiere_author_recomend_5: 'Рекомендую к просмотру.',
     premiere_title: 'Премьера',
 
     termsofuse_t_01: 'Правила использования',
