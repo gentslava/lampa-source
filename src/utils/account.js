@@ -59,7 +59,7 @@ function init(){
             timelines(true)
 
             updateProfileIcon()
-        } 
+        }
     })
 
     Socket.listener.follow('open',checkValidAccount)
@@ -188,12 +188,6 @@ function getUser(){
     }
 }
 
-function checkPremium(){
-    let user = user_data || Storage.get('account_user','{}')
-
-    return user.id ? Utils.countDays(Date.now(), user.premium) : 0
-}
-
 function timelines(full, visual){
     let account = Storage.get('account','{}')
 
@@ -239,7 +233,7 @@ function timelines(full, visual){
 
                 Storage.set(name, viewed)
             }
-            
+
             Storage.set('timeline_full_update_time',Date.now())
         },()=>{
             setTimeout(timelines.bind(timelines,full), 1000 * 60)
@@ -276,7 +270,7 @@ function save(method, type, card){
         if(method == 'remove'){
             if(find){
                 Arrays.remove(list, find)
-            } 
+            }
         }
         else{
             Arrays.insert(list,0,{
@@ -375,7 +369,7 @@ function extensions(call){
             }
         }
     }
-    
+
     network.timeout(5000)
     network.silent(api + 'extensions/list',(result)=>{
         if(result.secuses){
@@ -407,7 +401,7 @@ function extensions(call){
     },()=>{
         call(Storage.get('account_extensions','{}'))
     },false,headers)
-    
+
 }
 
 function pluginsStatus(plugin, status){
@@ -455,22 +449,22 @@ function addDevice(){
                 if(new_value && new_value.length == 6 && !isNaN(code)){
                     Loading.start(()=>{
                         network.clear()
-                
+
                         Loading.stop()
                     })
-                
+
                     network.clear()
-                
+
                     network.silent(api + 'device/add',(result)=>{
                         Loading.stop()
 
                         Storage.set('account',result,true)
                         Storage.set('account_email',result.email,true)
-                
+
                         window.location.reload()
                     },()=>{
                         Loading.stop()
-                        
+
                         Noty.show(Lang.translate('account_code_error'))
                     },{
                         code
@@ -495,7 +489,7 @@ function addDevice(){
             }
         })
     }
-    
+
     displayModal()
 }
 
@@ -509,15 +503,11 @@ function renderPanel(){
 
             body.find('.settings--account-status').nextAll().remove()
         }
-        
+
         body.find('.settings--account-signin').toggleClass('hide',signed)
         body.find('.settings--account-user').toggleClass('hide',!signed)
-        body.find('.settings--account-premium').toggleClass('selectbox-item--checked',Boolean(checkPremium()))
-        body.find('.settings-param__label').toggleClass('hide',!Boolean(checkPremium()))
-
-        if(!checkPremium()){
-            body.find('.selectbox-item').on('hover:enter',showCubPremium)
-        }
+        body.find('.settings--account-premium').toggleClass('selectbox-item--checked',true)
+        body.find('.settings-param__label').toggleClass('hide',false)
 
         body.find('.settings--account-device-add').on('hover:enter',addDevice)
 
@@ -599,7 +589,7 @@ function renderPanel(){
                                             update()
 
                                             loader.remove()
-                                        } 
+                                        }
                                     },
                                     error: function(){
                                         Noty.show(Lang.translate('account_export_fail'))
@@ -688,7 +678,7 @@ function showProfiles(controller){
         }
     },()=>{
         Loading.stop()
-        
+
         Noty.show(Lang.translate('account_profiles_empty'))
     },false,{
         headers: {
@@ -742,7 +732,7 @@ function updateBookmarks(rows, call){
         bookmarks = e.data
 
         if(call) call()
-        
+
         listener.send('update_bookmarks',{rows, bookmarks: e.data})
     })
 }
@@ -894,7 +884,7 @@ function backup(){
                 }
                 else if(a.import){
                     network.silent(api + 'users/backup/import',(data)=>{
-                        
+
                         if(data.data){
                             let keys = Arrays.getKeys(data.data)
 
@@ -1059,7 +1049,7 @@ let Account = {
 
 Object.defineProperty(Account, 'hasPremium', {
     value: function() {
-       return checkPremium()
+       return 1
     },
     writable: false
 })

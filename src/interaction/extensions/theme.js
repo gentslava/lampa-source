@@ -63,8 +63,6 @@ class Theme extends Item{
                 Controller.toggle(controller)
 
                 if(a.toggle){
-                    if(!this.active() && this.data.premium && !Account.hasPremium()) return Lampa.Account.showCubPremium()
-
                     Themes.toggle(this.active() ? '' : this.link)
 
                     this.update()

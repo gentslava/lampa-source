@@ -20,7 +20,7 @@ import Account from '../utils/account'
 /**
  * Карточка
  * @param {object} data
- * @param {{isparser:boolean, card_small:boolean, card_category:boolean, card_collection:boolean, card_wide:true}} params 
+ * @param {{isparser:boolean, card_small:boolean, card_category:boolean, card_collection:boolean, card_wide:true}} params
  */
 function Card(data, params = {}){
     this.data   = data
@@ -29,7 +29,7 @@ function Card(data, params = {}){
     Arrays.extend(data,{
         title: data.name,
         original_title: data.original_name,
-        release_date: data.first_air_date 
+        release_date: data.first_air_date
     })
 
     data.release_year = ((data.release_date || data.birthday || '0000') + '').slice(0,4)
@@ -51,7 +51,7 @@ function Card(data, params = {}){
             let elem_title   = this.card.querySelector('.card-parser__title')
             let elem_size    = this.card.querySelector('.card-parser__size')
             let elem_details = this.card.querySelector('.card-parser__details')
-        
+
             if(elem_title) elem_title.innerText = data.Title
             if(elem_size) elem_size.innerText = data.size
 
@@ -64,11 +64,11 @@ function Card(data, params = {}){
             grabs.innerHTML = Lang.translate('torrent_item_grabs') + ': <span>' + data.Peers + '</span>'
 
             elem_details.appendChild(seeds)
-            elem_details.appendChild(grabs) 
+            elem_details.appendChild(grabs)
         }
         else{
             let elem_title = this.card.querySelector('.card__title')
-            
+
             if(elem_title) elem_title.innerText = data.title
 
             if(data.first_air_date){
@@ -79,8 +79,8 @@ function Card(data, params = {}){
                 this.card.querySelector('.card__view').appendChild(type_elem)
                 this.card.classList.add(data.first_air_date ? 'card--tv' : 'card--movie')
             }
-            
-            
+
+
             if(params.card_small){
                 this.card.classList.add('card--small')
 
@@ -122,9 +122,9 @@ function Card(data, params = {}){
 
                         promo_wrap.appendChild(promo_text)
                     }
-                    
+
                     this.card.querySelector('.card__view').appendChild(promo_wrap)
-                } 
+                }
 
                 if(Storage.field('light_version')) remove(this.card.querySelector('.card__title'))
 
@@ -140,7 +140,7 @@ function Card(data, params = {}){
                 if(year) year.innerText = data.release_year
             }
 
-            
+
             let vote = parseFloat((data.vote_average || 0) + '').toFixed(1)
 
             if(vote > 0){
@@ -156,7 +156,7 @@ function Card(data, params = {}){
             if(qu && Storage.field('card_quality')){
                 let quality = document.createElement('div')
                     quality.classList.add('card__quality')
-                
+
                 let quality_inner = document.createElement('div')
                     quality_inner.innerText = qu
 
@@ -169,7 +169,7 @@ function Card(data, params = {}){
         this.card.addEventListener('visible',this.visible.bind(this))
         this.card.addEventListener('update',this.update.bind(this))
     }
-    
+
     /**
      * Загрузить картинку
      */
@@ -181,7 +181,7 @@ function Card(data, params = {}){
 
             ImageCache.write(this.img, this.img.src)
         }
-    
+
         this.img.onerror = ()=>{
             Tmdb.broken()
 
@@ -193,13 +193,13 @@ function Card(data, params = {}){
 
     /**
      * Добавить иконку
-     * @param {string} name 
+     * @param {string} name
      */
     this.addicon = function(name){
         let icon = document.createElement('div')
             icon.classList.add('card__icon')
             icon.classList.add('icon--'+name)
-        
+
         this.card.querySelector('.card__icons-inner').appendChild(icon)
     }
 
@@ -307,8 +307,8 @@ function Card(data, params = {}){
 
     /**
      * Вызвали меню
-     * @param {object} target 
-     * @param {object} data 
+     * @param {object} target
+     * @param {object} data
      */
     this.onMenu = function(target, data){
         let enabled = Controller.enabled().name
@@ -354,11 +354,11 @@ function Card(data, params = {}){
                 where: m,
                 picked: status[m],
                 collect: true,
-                noenter: !Account.hasPremium()
+                noenter: false
             })
         })
 
-        
+
         Manifest.plugins.forEach(plugin=>{
             if(plugin.type == 'video' && plugin.onContextMenu && plugin.onContextLauch){
                 menu_plugins.push({
@@ -395,7 +395,7 @@ function Card(data, params = {}){
             title: Lang.translate('more'),
             separator: true
         })
-        
+
 
         let menu_main = menu_plugins.length ? menu_plugins.concat(menu_favorite) : menu_favorite
 
@@ -429,24 +429,7 @@ function Card(data, params = {}){
 
                 Controller.toggle(enabled)
             },
-            onDraw: (item, elem)=>{
-                if(elem.collect){
-                    if(!Account.hasPremium()){
-                        let wrap = $('<div class="selectbox-item__lock"></div>')
-                            wrap.append(Template.js('icon_lock'))
-
-                        item.find('.selectbox-item__checkbox').remove()
-
-                        item.append(wrap)
-
-                        item.on('hover:enter',()=>{
-                            Select.close()
-
-                            Account.showCubPremium()
-                        })
-                    }
-                }
-            }
+            onDraw: ()=>{}
         })
     }
 
@@ -467,7 +450,7 @@ function Card(data, params = {}){
 
             if(this.onTouch) this.onTouch(this.card, data)
         })
-        
+
         this.card.addEventListener('hover:hover',()=>{
             this.watched()
 
@@ -477,7 +460,7 @@ function Card(data, params = {}){
         this.card.addEventListener('hover:enter',()=>{
             if(this.onEnter) this.onEnter(this.card, data)
         })
-        
+
         this.card.addEventListener('hover:long',()=>{
             if(this.onMenu) this.onMenu(this.card, data)
         })

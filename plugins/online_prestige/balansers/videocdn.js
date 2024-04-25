@@ -75,7 +75,7 @@ function videocdn(component, _object){
 
         if(a.stype == 'voice'){
             choice.voice_name = filter_items.voice[b.index]
-        } 
+        }
 
         component.reset()
 
@@ -155,9 +155,9 @@ function videocdn(component, _object){
                         if (0 === (i - 0)) {
                             continue;
                         }
-                        
+
                         text.innerHTML = json[i]
-                        
+
                         let max_quality = movie.media?.filter(obj => obj.translation_id === (i - 0))[0]?.max_quality;
 
                         if (!max_quality) {
@@ -175,7 +175,7 @@ function videocdn(component, _object){
                             if(elem.folder){
                                 for(let f in elem.folder){
                                     let folder = elem.folder[f]
-                                    
+
                                     folder.items = extractItems(folder.file, max_quality)
                                 }
                             }
@@ -214,7 +214,7 @@ function videocdn(component, _object){
                                 items = folder.items
 
                                 break
-                            } 
+                            }
                         }
                     }
                     else if(elem.id == id){
@@ -226,7 +226,7 @@ function videocdn(component, _object){
             }
             else{
                 items = translat.items
-            } 
+            }
         }
 
         if(items && items.length){
@@ -234,20 +234,20 @@ function videocdn(component, _object){
 
             let mass = [720,480,360]
 
-            if(Lampa.Account.hasPremium()) Lampa.Arrays.insert(mass,0,1080)
+            Lampa.Arrays.insert(mass,0,1080)
 
-                mass.forEach((n)=>{
-                    let exes = items.find(a=>a.quality == n)
+            mass.forEach((n)=>{
+                let exes = items.find(a=>a.quality == n)
 
-                    if(exes){
-                        if(!file) file = exes.file
+                if(exes){
+                    if(!file) file = exes.file
 
-                        quality[n + 'p'] = exes.file
-                    }
-                })
+                    quality[n + 'p'] = exes.file
+                }
+            })
 
             let preferably = Lampa.Storage.get('video_quality_default','1080') + 'p'
-        
+
             if(quality[preferably]) file = quality[preferably]
         }
 
@@ -263,7 +263,7 @@ function videocdn(component, _object){
             voice: [],
             voice_info: []
         }
-        
+
         results.slice(0,1).forEach(movie => {
             let seasons = movie.season_count || object.movie.number_of_seasons
 
@@ -293,7 +293,7 @@ function videocdn(component, _object){
 
         if(choice.voice_name){
             let inx = filter_items.voice.map(v=>v.toLowerCase()).indexOf(choice.voice_name.toLowerCase())
-            
+
             if(inx == -1) choice.voice = 0
             else if(inx !== choice.voice){
                 choice.voice = inx
