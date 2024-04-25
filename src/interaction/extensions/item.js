@@ -24,9 +24,9 @@ class Item{
         this.html.querySelector('.extensions__item-author').innerText  = this.data.author || (this.params.type == 'plugins' ? '@cub' : '@lampa')
         this.html.querySelector('.extensions__item-descr').innerText   = (this.data.descr || url).replace(/\n|\t|\r/g,' ')
 
-        let proto = this.html.querySelector('.extensions__item-proto')
+        let proto = $('.extensions__item-proto')
 
-        if(proto && hts){
+        if (proto && hts) {
             proto.toggleClass('hide', !Boolean(this.params.type == 'plugins' || this.params.type == 'installs'))
             proto.addClass('protocol-' + (loc ? 'https' : 'http'))
         }
@@ -43,20 +43,8 @@ class Item{
         let cub = document.createElement('div')
             cub.classList.add('extensions__cub')
             cub.innerText = 'CUB'
-            
+
         this.html.appendChild(cub)
-    }
-
-    premium(){
-        let author = this.html.querySelector('.extensions__item-author')
-
-        let premium = document.createElement('span')
-            premium.classList.add('extensions__item-premium')
-            premium.innerText = 'CUB Premium'
-
-        let where = author || this.html
-
-        where.appendChild(premium)
     }
 
     visible(){

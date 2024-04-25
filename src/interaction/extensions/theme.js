@@ -31,8 +31,6 @@ class Theme extends Item{
     visible(){
         super.visible()
 
-        if(this.data.premium) this.premium()
-
         this.img = this.html.querySelector('.extensions__item-image')
 
         this.img.onload = ()=>{

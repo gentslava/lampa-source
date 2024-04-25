@@ -21,8 +21,7 @@ class Extension extends Item {
     visible(){
         super.visible()
 
-        if(this.params.cub)   this.cub()
-        if(this.data.premium) this.premium()
+        if(this.params.cub) this.cub()
         if(this.params.autocheck) this.check()
 
         if(Plugins.loaded().indexOf(this.data.url || this.data.link) >= 0) this.html.querySelector('.extensions__item-included').classList.remove('hide')
@@ -126,7 +125,7 @@ class Extension extends Item {
                                 Plugins.push(this.data)
                             }
                         }
-        
+
                         back()
                     })
                 }

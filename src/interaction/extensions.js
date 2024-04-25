@@ -14,13 +14,13 @@ function show(params = {}){
     let controller = Controller.enabled().name
 
     extensions = new Main(params)
-    
+
     extensions.onBack = ()=>{
         extensions.destroy()
 
         extensions = null
 
-        document.body.toggleClass('ambience--enable',false)
+        $('body').toggleClass('ambience--enable',false)
 
         Controller.toggle(controller)
 
@@ -31,8 +31,8 @@ function show(params = {}){
 
     extensions.create()
 
-    document.body.toggleClass('ambience--enable',true)
-    
+    $('body').toggleClass('ambience--enable',true)
+
     document.body.appendChild(extensions.render(true))
 
     extensions.toggle()
