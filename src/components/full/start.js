@@ -58,7 +58,7 @@ function create(data, params = {}){
         let countries = Api.sources.tmdb.parseCountries(data.movie)
         let seasons   = Utils.countSeasons(data.movie)
 
-        html = Template.get('full_start' + (new_html ? '_new' : ''),{
+        html = Template.get('full_start' + (new_html ? '_new' : ''), {
             title: data.movie.title,
             original_title: data.movie.original_title,
             descr: Utils.substr(data.movie.overview || Lang.translate('full_notext'), 420),
@@ -290,41 +290,40 @@ function create(data, params = {}){
         if(!Storage.field('card_interfice_reactions')) return html.find('.full-start-new__reactions, .button--reaction').remove()
 
         let drawReactions = ()=>{
-            if(data.reactions && data.reactions.result && data.reactions.result.length){
-                let reactions = data.reactions.result
-                let reactions_body = html.find('.full-start-new__reactions')[0]
+            if (data.reactions && data.reactions.result && data.reactions.result.length) {
+                let reactions = data.reactions.result;
 
                 reactions.sort((a,b)=>{
                     return a.counter > b.counter ? -1 : a.counter < b.counter ? 1 : 0
                 })
 
-                reactions_body.empty()
+                let reactions_body = html.find('.full-start-new__reactions')[0];
 
-                reactions.forEach(r=>{
+                reactions_body.innerHTML = '';
+
+                reactions.forEach((r) => {
                     let reaction = document.createElement('div'),
                         icon     = document.createElement('img'),
                         count    = document.createElement('div'),
                         wrap     = document.createElement('div')
 
-                    reaction.addClass('reaction')
-                    icon.addClass('reaction__icon')
-                    count.addClass('reaction__count')
+                    reaction.className = `reaction reaction--${r.type}`;
+                    icon.className = `reaction__icon`;
+                    count.className = `reaction__count`;
 
-                    reaction.addClass('reaction--' + r.type)
+                    count.innerText = Utils.bigNumberToShort(r.counter);
 
-                    count.text(Utils.bigNumberToShort(r.counter))
+                    icon.src = `${Utils.protocol()}${Manifest.cub_domain}/img/reactions/${r.type}.svg`;
 
-                    icon.src = Utils.protocol() + Manifest.cub_domain + '/img/reactions/' + r.type + '.svg'
+                    reaction.append(icon);
+                    reaction.append(count);
 
-                    reaction.append(icon)
-                    reaction.append(count)
+                    wrap.append(reaction);
 
-                    wrap.append(reaction)
+                    if (this.vote(r.type)) reaction.classList.add('reaction--voted');
 
-                    if(this.vote(r.type)) reaction.addClass('reaction--voted')
-
-                    reactions_body.append(wrap)
-                })
+                    reactions_body.append(wrap);
+                });
             }
         }
 
