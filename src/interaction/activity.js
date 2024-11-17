@@ -5,10 +5,11 @@ import Controller from './controller'
 import Head from '../components/head'
 import Storage from '../utils/storage'
 import Lang from '../utils/lang'
-import Layer from '../utils/layer'
 import DeviceInput from '../utils/device_input'
 import Screensaver from './screensaver'
 import Utils from '../utils/math'
+import Arrays from '../utils/arrays'
+import Platform from '../utils/platform'
 
 let listener  = Subscribe()
 let activites = []
@@ -17,6 +18,7 @@ let fullout   = false
 let content
 let slides
 let maxsave
+let base
 
 function Activity(component, object){
     let slide = Template.js('activity')
@@ -194,10 +196,12 @@ function Activity(component, object){
     this.append()
 }
 
-function parseStartCard(){
+function parseStart(){
+    if(window.start_deep_link) return
+
     let id = Utils.gup('card')
 
-    if(id && !window.start_deep_link){
+    if(id){
         window.start_deep_link = {
             id: id,
             component: "full",
@@ -209,6 +213,22 @@ function parseStartCard(){
             }
         }
     }
+    else{
+        try{
+            let params = new URLSearchParams(window.location.search)
+
+            if(params.has('component')){
+                window.start_deep_link = {}
+
+                params.forEach((v,n)=>{
+                    window.start_deep_link[n] = v
+                })
+            }
+        }
+        catch(e){
+            console.log('Activity', 'url params start error:', e.message)
+        }
+    }
 }
 
 /**
@@ -218,23 +238,29 @@ function init(){
     content   = Template.js('activitys')
     slides    = content.querySelector('.activitys__slides')
     maxsave   = Storage.get('pages_save_total',5)
+    base      = document.querySelector('head base')
 
-    parseStartCard()
+    parseStart()
 
     empty()
 
     let wait = true
+
+    let swip_status = 0
+    let swip_timer
 
     setTimeout(()=>{
         wait = false
     },1500)
 
     window.addEventListener('popstate', () => {
+        if(window.god_enabled) Lampa.Noty.show('Popstate - ['+(fullout || wait)+']')
+
         if(fullout || wait) return
 
         Screensaver.stop()
     
-        empty()
+        if(swip_status == 0) empty() //это чтоб не выходило с приложения, однако на айфонах это вызвает зависание на 2-3 сек
     
         listener.send('popstate',{count: activites.length})
     
@@ -252,6 +278,28 @@ function init(){
             })
         }
     })
+
+    //исключительно для огрызков пришлось мутить работу свайпа назад
+    if(Platform.is('apple')){
+        let body = document.querySelector('body')
+
+        body.addEventListener('touchstart',(e)=>{
+            let point = e.touches[0] || e.changedTouches[0]
+
+            if (point.clientX < window.innerWidth * 0.15 && point.clientX < window.innerHeight - 120){
+                swip_status = 1
+
+                clearTimeout(swip_timer)
+
+                swip_timer = setTimeout(()=>{
+                    swip_status = 0
+                },2000)
+            }
+            else{
+                swip_status = 0
+            }
+        })
+    }
 }
 
 
@@ -275,9 +323,49 @@ function limit(){
         if(first.activity){
             first.activity.destroy()
 
+            Lampa.Listener.send('activity',{component: first.component, type: 'destroy', object: first})
+
             first.activity = null
         } 
     } 
+}
+
+/**
+ * Обновить адрес в строке из активности
+ */
+function pushState(object, replace, mix){
+    let path = window.location.protocol == 'file:' ? '' : base ? '/' : ''
+
+    if(!window.lampa_settings.push_state) return window.history.pushState(null, null, path)
+
+    let data = Arrays.clone(object)
+
+    delete data.activity
+
+    let comp = []
+
+    for(let n in data){
+        if(typeof data[n] == 'string' || typeof data[n] == 'number') comp.push(n + '=' + encodeURIComponent(data[n]))
+    }
+
+    let card = object.card || object.movie
+    let meth = object.method || (card ? card.name ? 'tv' : 'movie' : '')
+    let sour = object.source || (card ? card.source : 'tmdb')
+    let durl = card ? '?card=' + card.id + (meth ? '&media=' + meth : '') + (sour ? '&source=' + sour : '') : '?' + comp.join('&')
+
+    if(mix) durl += '&' + mix
+
+    if(replace) window.history.replaceState(null, null, path + durl)
+    else window.history.pushState(null, null, path + durl)
+}
+
+/**
+ * Обновить адрес в строке из активности с добавлением дополнительных параметров
+ */
+function mixState(mix){
+    let curent = active()
+
+    if(curent  && curent.activity) pushState(curent, true, mix)
 }
 
 /**
@@ -292,6 +380,8 @@ function push(object){
     activites.push(object)
 
     start(object)
+
+    pushState(object)
 }
 
 /**
@@ -316,7 +406,12 @@ function create(object){
  * Вызов обратно пользователем
  */
 function back(){
-    window.history.back();
+    listener.send('popstate',{count: activites.length})
+    
+    if(callback) callback()
+    else{
+        backward()
+    }
 }
 
 /**
@@ -332,10 +427,12 @@ function inActivity(){
 }
 
 /**
- * Создат пустую историю
+ * Создать пустую историю
  */
 function empty(){
-    window.history.pushState(null, null, window.location.pathname)
+    let curent = active()
+
+    if(curent  && curent.activity) pushState(curent, false, 'r=' + Math.random())
 }
 
 /**
@@ -395,11 +492,15 @@ function backward(){
             start(previous_tree)
             
             Lampa.Listener.send('activity',{component: previous_tree.component, type: 'archive', object: previous_tree})
+
+            pushState(previous_tree, true)
         }
         else {
             create(previous_tree)
 
             start(previous_tree)
+
+            pushState(previous_tree)
         }
     }
 }
@@ -458,7 +559,15 @@ function last(){
     let active = Storage.get('activity','false')
     let start_from = Storage.field("start_page")
 
-    if(window.start_deep_link){
+    if(window.lampa_settings.iptv){
+        active = {
+            component: 'iptv',
+            page: 1
+        }
+
+        push(active)
+    }
+    else if(window.start_deep_link){
         push(window.start_deep_link)
     }
     else if(active && start_from === "last"){
@@ -544,7 +653,11 @@ function replace(replace = {}, clear){
         object[i] = replace[i]
     }
 
-    active().activity.destroy()
+    let made = active()
+
+    made.activity.destroy()
+
+    Lampa.Listener.send('activity',{component: made.component, type: 'destroy', object: made})
 
     activites.pop()
 
@@ -566,5 +679,7 @@ export default {
     all,
     extractObject,
     renderLayers,
-    inActivity
+    inActivity,
+    pushState,
+    mixState
 }

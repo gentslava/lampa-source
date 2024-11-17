@@ -24,8 +24,8 @@
     &__more{
         margin-left: 2em;
         padding: 0.4em 1em;
-        background: rgba(0,0,0,0.33);
-        border-radius: 0.3em;
+        background: rgba(0,0,0,0.3);
+        border-radius: 2em;
 
         &.focus{
             background-color: #fff;
@@ -44,10 +44,24 @@
         &-collection{
             min-height: 15em;
         }
+        &-player-cards{
+            .items-line__head{
+                padding-left: 0.8em;
+            }
+            .items-line__body .scroll__content{
+                padding: 0 1em;
+            }
+        }
     }
 }
 
 .items-cards{
     display: flex;
     align-items: self-start;
+
+    .card--collection{
+        @media screen and (max-width: $media_md) {
+            width: 19.7em;
+        }
+    }
 }

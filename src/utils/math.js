@@ -375,7 +375,7 @@ function cardImgBackground(card_data){
 
 function cardImgBackgroundBlur(card_data){
     let uri = card_data.poster_path || card_data.profile_path ? Api.img(card_data.poster_path || card_data.profile_path,'w200') : card_data.poster || card_data.img || ''
-    let pos = window.innerWidth > 400 && Storage.field('background_type') == 'poster'
+    let pos = window.innerWidth > 400 && Storage.field('background_type') == 'poster' && !Storage.field('card_interfice_cover')
 
     if(Storage.field('background')){
         if(card_data.backdrop_path)                uri = Api.img(card_data.backdrop_path, pos ? 'w1280' : 'w200')
@@ -614,6 +614,39 @@ function dcma(media, id){
     return window.lampa_settings.dcma && window.lampa_settings.dcma.find(a=>a.cat == media && a.id == id)
 }
 
+function inputDisplay(value){
+    let f = value.trim()
+    let d = f.length - value.length
+    let e = d < 0 ? value.slice(d).replace(/\s/g,'&nbsp;') : ''
+
+    return f + e
+}
+
+function filterCardsByType(items, need){
+    let filtred = []
+
+    let genres = (card, id)=>{
+        let gen = card.genres || card.genre_ids
+
+        if(gen && Object.prototype.toString.call( gen ) === '[object Array]'){
+            return gen.find(g=>{
+                if(typeof g == 'object') return g.id == id
+                else g == id
+            })
+        }
+
+        return false
+    }
+
+    if(need == 'movies')    filtred = items.filter(a=>!a.name && !genres(a, 16))
+    if(need == 'tv')        filtred = items.filter(a=>a.name && !genres(a, 16))
+    if(need == 'multmovie') filtred = items.filter(a=>!a.name && genres(a, 16))
+    if(need == 'multtv')    filtred = items.filter(a=>a.name && genres(a, 16))
+    
+
+    return filtred
+}
+
 export default {
     secondsToTime,
     secondsToTimeHuman,
@@ -655,5 +688,7 @@ export default {
     rewriteIfHTTPS,
     checkEmptyUrl,
     gup,
-    dcma
+    dcma,
+    inputDisplay,
+    filterCardsByType
 }

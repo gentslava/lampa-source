@@ -29,4 +29,14 @@ body.touch-device{
             flex-shrink: 0;
         }
     }
+
+    @media screen and (max-width: $media_xm) {
+        .settings__body,
+        .modal__body,
+        .selectbox__body{
+            .scroll{
+                overscroll-behavior: none;
+            }
+        }
+    }
 }

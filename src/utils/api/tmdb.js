@@ -81,6 +81,11 @@ function url(u, params = {}){
         }
     }
 
+    // Добавляем проверку для запросов по жанрам
+    if (params.genres && u.indexOf('discover/') !== 0) {
+        u = 'discover/' + u;
+    }
+
     return TMDB.api(u)
 }
 
@@ -365,7 +370,7 @@ function full(params = {}, oncomplite, onerror){
 
     if(Utils.dcma(params.method, params.id)) return onerror()
 
-    get(params.method+'/'+params.id+'?append_to_response=content_ratings,release_dates,external_ids,keywords',params,(json)=>{
+    get(params.method+'/'+params.id+'?append_to_response=content_ratings,release_dates,external_ids,keywords,alternative_titles',params,(json)=>{
         json.source = 'tmdb'
 
         if(json.external_ids){
@@ -416,6 +421,14 @@ function full(params = {}, oncomplite, onerror){
     Api.sources.cub.reactionsGet(params,(json)=>{
         status.append('reactions', json)
     })
+
+    if(Lang.selected(['ru','uk','be'])){
+        status.need++
+
+        Api.sources.cub.discussGet(params, (json)=>{
+            status.append('discuss', json)
+        })
+    }
 }
 
 function videos(params = {}, oncomplite, onerror){

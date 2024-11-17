@@ -17,7 +17,7 @@ function open(params){
     html = Template.get('modal',{title: params.title})
 
     html.on('click',(e)=>{
-        if(!$(e.target).closest($('.modal__content',html)).length && DeviceInput.canClick(e.originalEvent)) window.history.back()
+        if(!$(e.target).closest($('.modal__content',html)).length && DeviceInput.canClick(e.originalEvent)) Controller.back()
     })
 
     title(params.title)
@@ -44,7 +44,7 @@ function open(params){
         </div>`)
 
         close_button.on('click',()=>{
-            window.history.back()
+            Controller.back()
         })
 
         html.find('.modal__content').prepend(close_button)
@@ -62,6 +62,14 @@ function open(params){
 
     scroll.append(params.html)
 
+    scroll.addSwipeDown(()=>{
+        html.addClass('animate-down')
+
+        setTimeout(()=>{
+            Controller.back()
+        },200)
+    })
+
     if(params.buttons) buttons()
 
     $('body').append(html)
@@ -69,10 +77,12 @@ function open(params){
     max()
 
     toggle(params.select)
+
+    html.addClass('animate')
 }
 
 function max(){
-    scroll.render().find('.scroll__content').css('max-height',  Math.round(window.innerHeight - scroll.render().offset().top - (window.innerHeight * 0.1)) + 'px')
+    scroll.render().find('.scroll__content').css('max-height',  Math.round(window.innerWidth <= 480 ? window.innerHeight * 0.6 : window.innerHeight - scroll.render().offset().top - (window.innerHeight * 0.1)) + 'px')
 }
 
 function buttons(){

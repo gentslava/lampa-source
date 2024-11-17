@@ -194,7 +194,7 @@ function YouTube(call_video){
     video.resize = function(){
         object.find('.player-video__youtube-player').width(window.innerWidth * screen_size)
 	    object.find('.player-video__youtube-player').height((window.innerHeight + 600) * screen_size)
-		object.find('.player-video__youtube-player').css({transform: 'scale(0.5)'})
+		object.find('.player-video__youtube-player').addClass('minimize')//.css({transform: 'scale(0.5)'})
     }
 
     /**
@@ -207,9 +207,13 @@ function YouTube(call_video){
 	 */
 	video.load = function(){
 		if(stream_url && !youtube){
+			let id = stream_url.split('?v=').pop()
+
             video.resize()
 
-			let id = stream_url.split('?v=').pop()
+			if(typeof YT == 'undefined'){
+				return object.append('<div class="player-video__youtube-needclick"><img src="https://img.youtube.com/vi/'+id+'/sddefault.jpg" /><div>'+Lang.translate('torrent_error_connect') + '</div></div>')
+			}
 
 			if(needclick){
 				object.append('<div class="player-video__youtube-needclick"><img src="https://img.youtube.com/vi/'+id+'/sddefault.jpg" /><div>'+Lang.translate('loading') + '...' + '</div></div>')

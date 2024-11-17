@@ -88,6 +88,9 @@ import VPN from './utils/vpn'
 import Processing from './interaction/processing'
 import ParentalControl from './interaction/parental_control'
 import Personal from './utils/personal'
+import Sound from './utils/sound'
+import AppStatus from './interaction/status'
+import Iptv from './utils/iptv'
 
 /**
  * Настройки движка
@@ -116,7 +119,11 @@ Arrays.extend(window.lampa_settings,{
 
     read_only: false,
 
-    dcma: false
+    dcma: false,
+
+    push_state: true,
+
+    iptv: false
 })
 
 /**
@@ -130,91 +137,100 @@ if(window.localStorage.getItem('remove_white_and_demo')){
     window.lampa_settings.white_use    = false
 }
 
-window.Lampa = {
-    Listener: Subscribe(),
-    Lang,
-    Subscribe,
-    Storage,
-    Platform,
-    Utils,
-    Params,
-    Menu,
-    Head,
-    Notice,
-    NoticeClass,
-    NoticeClassLampa,
-    Background,
-    Favorite,
-    Select,
-    Controller,
-    Activity,
-    Keypad,
-    Template,
-    Component,
-    Reguest,
-    Filter,
-    Files,
-    Explorer,
-    Scroll,
-    Empty,
-    Arrays,
-    Noty,
-    Player,
-    PlayerVideo,
-    PlayerInfo,
-    PlayerPanel,
-    PlayerIPTV,
-    PlayerPlaylist,
-    Timeline,
-    Modal,
-    Api,
-    Cloud,
-    Settings,
-    SettingsApi,
-    Android,
-    Card,
-    Info,
-    Account,
-    Socket,
-    Input,
-    Screensaver,
-    Recomends,
-    VideoQuality,
-    TimeTable,
-    Broadcast,
-    Helper,
-    InteractionMain,
-    InteractionCategory,
-    InteractionLine,
-    Status,
-    Plugins,
-    Extensions,
-    Tizen,
-    Layer,
-    Console,
-    Iframe,
-    Parser,
-    Manifest,
-    TMDB,
-    Base64,
-    Loading,
-    YouTube,
-    WebOSLauncher,
-    Event,
-    Search,
-    DeviceInput,
-    Worker: AppWorker,
-    DB,
-    NavigationBar,
-    Endless,
-    Color,
-    Cache,
-    Torrent,
-    Torserver,
-    Speedtest,
-    Processing,
-    ParentalControl,
-    VPN
+if(window.lampa_settings.iptv){
+    window.lampa_settings.socket_use    = false
+    window.lampa_settings.plugins_store = false
+    window.lampa_settings.account_sync  = false
+    window.lampa_settings.torrents_use  = false
+}
+
+function initClass(){
+    window.Lampa = {
+        Listener: Subscribe(),
+        Lang,
+        Subscribe,
+        Storage,
+        Platform,
+        Utils,
+        Params,
+        Menu,
+        Head,
+        Notice,
+        NoticeClass,
+        NoticeClassLampa,
+        Background,
+        Favorite,
+        Select,
+        Controller,
+        Activity,
+        Keypad,
+        Template,
+        Component,
+        Reguest,
+        Filter,
+        Files,
+        Explorer,
+        Scroll,
+        Empty,
+        Arrays,
+        Noty,
+        Player,
+        PlayerVideo,
+        PlayerInfo,
+        PlayerPanel,
+        PlayerIPTV,
+        PlayerPlaylist,
+        Timeline,
+        Modal,
+        Api,
+        Cloud,
+        Settings,
+        SettingsApi,
+        Android,
+        Card,
+        Info,
+        Account,
+        Socket,
+        Input,
+        Screensaver,
+        Recomends,
+        VideoQuality,
+        TimeTable,
+        Broadcast,
+        Helper,
+        InteractionMain,
+        InteractionCategory,
+        InteractionLine,
+        Status,
+        Plugins,
+        Extensions,
+        Tizen,
+        Layer,
+        Console,
+        Iframe,
+        Parser,
+        Manifest,
+        TMDB,
+        Base64,
+        Loading,
+        YouTube,
+        WebOSLauncher,
+        Event,
+        Search,
+        DeviceInput,
+        Worker: AppWorker,
+        DB,
+        NavigationBar,
+        Endless,
+        Color,
+        Cache,
+        Torrent,
+        Torserver,
+        Speedtest,
+        Processing,
+        ParentalControl,
+        VPN
+    }
 }
 
 function closeApp(){
@@ -224,6 +240,7 @@ function closeApp(){
     if(Platform.is('android')) Android.exit()
     if(Platform.is('orsay')) Orsay.exit()
     if(Platform.is('netcast')) window.NetCastBack()
+    if(Platform.is('noname')) window.history.back()
 }
 
 function popupCloseApp(){
@@ -260,23 +277,41 @@ function popupCloseApp(){
 function prepareApp(){
     if(window.prepared_app) return
 
+    AppStatus.start()
+
     $('body').append(Noty.render())
 
     DeviceInput.init()
 
+    AppStatus.push('DeviceInput init')
+
     Platform.init()
+
+    AppStatus.push('Platform init')
 
     Params.init()
 
+    AppStatus.push('Params init')
+
     Controller.observe()
+
+    AppStatus.push('Controller observe init')
 
     Console.init()
 
+    AppStatus.push('Console init')
+
     Keypad.init()
+
+    AppStatus.push('Keypad init')
 
     Layer.init()
 
+    AppStatus.push('Layer init')
+
     Storage.init()
+
+    AppStatus.push('Storage init')
 
     /** Передаем фокус в контроллер */
 
@@ -287,7 +322,7 @@ function prepareApp(){
     /** Выход в начальном скрине */
 
     Keypad.listener.follow('keydown',(e)=>{
-        if(window.appready || Controller.enabled().name == 'modal') return
+        if(window.appready || Controller.enabled().name == 'modal' || (Platform.is('browser') || Platform.desktop())) return
 
         if (e.code == 8 || e.code == 27 || e.code == 461 || e.code == 10009 || e.code == 88) popupCloseApp()
     })
@@ -329,11 +364,17 @@ function prepareApp(){
         Utils.putStyle([
             'https://yumata.github.io/lampa/css/app.css?v' + Manifest.css_version
         ],()=>{
+            AppStatus.push('PutStyle ' + Manifest.css_version)
+
             old_css.remove()
+        },()=>{
+            AppStatus.critical('PutStyle https://yumata.github.io/lampa/css/app.css')
         })
     }
 
     Layer.update()
+
+    AppStatus.push('Prepare ready')
 
     window.prepared_app = true
 }
@@ -391,6 +432,8 @@ function startApp(){
 
     /** Стартуем */
 
+    AppStatus.push('Launching the application')
+
     Lampa.Listener.send('app',{type:'start'})
 
     /** Инициализируем классы */
@@ -426,6 +469,8 @@ function startApp(){
     Processing.init()
     ParentalControl.init()
 
+    AppStatus.push('Initialization successful')
+
     /** Надо зачиcтить, не хорошо светить пароль ;) */
 
     Storage.set('account_password','')
@@ -453,7 +498,9 @@ function startApp(){
     Activity.listener.follow('backward',(event)=>{
         if(!start_time) start_time = Date.now()
 
-        if(event.count == 1 && Date.now() > start_time + (1000 * 2)){
+        let noout = Platform.is('browser') || Platform.desktop()
+
+        if(event.count == 1 && Date.now() > start_time + (1000 * 2) && !noout){
             let enabled = Controller.enabled()
 
             Select.show({
@@ -491,9 +538,17 @@ function startApp(){
 
     Render.app()
 
+    AppStatus.push('Render app')
+
     /** Проверяем уведомления */
 
     Notice.drawCount()
+
+    AppStatus.push('Notice ready')
+
+    /** Временно вырезаем все для iptv, чтоб пройти модерацию */
+
+    window.lampa_settings.iptv && Iptv.init()
 
     /** Обновляем слои */
 
@@ -503,12 +558,18 @@ function startApp(){
 
     setTimeout(Activity.last.bind(Activity),0)
 
+    AppStatus.push('Run Activity')
+
     /** Гасим свет :D */
 
     setTimeout(()=>{
+        AppStatus.push('Hide logo')
+
         Keypad.enable()
 
         Screensaver.enable()
+
+        AppStatus.destroy()
 
         $('.welcome').fadeOut(500,()=>{
             $(this).remove()
@@ -640,6 +701,8 @@ function startApp(){
         }
     })
 
+    AppStatus.push('Subscriptions are successful')
+
     /** End */
 
     /** Добавляем класс платформы */
@@ -658,15 +721,21 @@ function startApp(){
         return window.location.protocol == 'file:' ? 'https://yumata.github.io/lampa/vender/' + lib : './vender/' + lib
     })
 
+    AppStatus.push('Connecting libraries')
+
     Utils.putScript(video_libs,()=>{})
 
     /** Сообщаем о готовности */
 
     Lampa.Listener.send('app',{type:'ready'})
 
+    AppStatus.push('Send app ready')
+
     /** Меню готово */
 
     Menu.ready()
+
+    AppStatus.push('Menu ready')
 
     /** Лампа полностью готова */
 
@@ -803,12 +872,26 @@ function startApp(){
         }
     })
 
+    if(Platform.is('android') || Platform.is('browser') || Platform.is('apple_tv') || Platform.desktop()){
+        Sound.add('hover',{
+            url: 'https://yumata.github.io/lampa/sound/hover.ogg'
+        })
+
+        Sound.add('enter',{
+            url: 'https://yumata.github.io/lampa/sound/hover.ogg',
+        })
+    }
+
+    AppStatus.push('The application is fully loaded')
+
     /** End */
 }
 
 function loadLang(){
     let code = window.localStorage.getItem('language') || 'ru'
     let call = ()=>{
+        AppStatus.push('Loading language completed')
+
         /** Принудительно стартовать */
         setTimeout(startApp,1000*5)
 
@@ -819,6 +902,8 @@ function loadLang(){
 
     if(['ru','en'].indexOf(code) >= 0) call()
     else{
+        AppStatus.push('Loading language')
+
         $.ajax({
             url: (location.protocol == 'file:' || Platform.is('nw') ? 'https://yumata.github.io/lampa/' : './') + 'lang/' + code + '.js',
             dataType: 'text',
@@ -861,14 +946,20 @@ function loadApp(){
     }
 }
 
-if(navigator.userAgent.toLowerCase().indexOf('crosswalk') > -1){
-    function checkReady(){
-        if(window.innerWidth > 0) loadApp()
-        else{
-            setTimeout(checkReady,100)
-        }
-    }
+if(!window.fitst_load){
+    window.fitst_load = true
 
-    checkReady()
+    initClass()
+
+    if(navigator.userAgent.toLowerCase().indexOf('lampa_client') > -1){
+        function checkReady(){
+            if(window.innerWidth > 0) loadApp()
+            else{
+                setTimeout(checkReady,100)
+            }
+        }
+
+        checkReady()
+    }
+    else loadApp()
 }
-else loadApp()

@@ -10,6 +10,7 @@ import Activity from '../interaction/activity'
 import Arrays from '../utils/arrays'
 import Empty from '../interaction/empty'
 import Reviews from './full/reviews'
+import Discuss from './full/discuss'
 import Episodes from './full/episodes'
 import Timetable from '../utils/timetable'
 import Lang from '../utils/lang'
@@ -17,8 +18,6 @@ import Storage from '../utils/storage'
 import Utils from '../utils/math'
 import Layer from '../utils/layer'
 import Platform from '../utils/platform'
-import Player from '../interaction/player'
-import Android from '../utils/android'
 
 let components = {
     start: Start,
@@ -26,6 +25,7 @@ let components = {
     persons: Persons,
     recomend: Line,
     simular: Line,
+    discuss: Discuss,
     comments: Reviews,
     episodes: Episodes
 }
@@ -39,6 +39,7 @@ function component(object){
     let tv      = Platform.screen('tv')
     let html    = $('<div class="layer--wheight"><img class="full-start__background"></div>')
     let background_image
+    let loaded_data
 
     this.create = function(){
         this.activity.loader(true)
@@ -63,6 +64,10 @@ function component(object){
                 this.empty()
             }
             else if(data.movie){
+                loaded_data = data
+
+                if(Activity.active().activity == this.activity) Activity.active().card = data.movie //для плагинов которые используют Activity.active().card
+
                 Lampa.Listener.send('full',{type:'start',object,data})
 
                 this.build('start', data)
@@ -101,7 +106,8 @@ function component(object){
                 }
                 if(data.persons && data.persons.cast && data.persons.cast.length) this.build('persons', data.persons.cast)
 
-                if(data.comments && data.comments.length) this.build('comments', data)
+                if(data.discuss) this.build('discuss', data)
+                else if(data.comments && data.comments.length) this.build('comments', data)
 
                 if(data.collection && data.collection.results.length){
                     data.collection.title   = Lang.translate('title_collection')
@@ -176,14 +182,15 @@ function component(object){
             create: ()=>{
                 let item = new components[name](data, {object: object, nomore: true, ...params})
 
+                item.mscroll = scroll
                 item.onDown = this.down.bind(this)
                 item.onUp   = this.up.bind(this)
                 item.onBack = this.back.bind(this)
                 item.onToggle = ()=>{
                     active = items.indexOf(item)
                 }
-                item.onScroll = (e)=>{
-                    scroll.update(e, true)
+                item.onScroll = (e, center)=>{
+                    scroll.update(e, center)
                 }
 
                 item.create()
@@ -200,13 +207,16 @@ function component(object){
     }
 
     this.visible = function(position){
-        create.slice(0, tv ? active + 2 : create.length).filter(e=>!e.created).forEach(e=>{
+        create.slice(0, tv ? active + 3 : create.length).filter(e=>!e.created).forEach(e=>{
             e.created = true
 
             e.create()
         })
 
-        Layer.visible(scroll.render(true))
+        //фиг знает, с задержкой все четко заработало
+        setTimeout(()=>{
+            Layer.visible(scroll.render(true))
+        },100)
 
         this.toggleBackgroundOpacity(position)
     }
@@ -251,7 +261,7 @@ function component(object){
     this.loadBackground = function(data){
         let background = data.movie.backdrop_path ? Api.img(data.movie.backdrop_path,'w1280') : data.movie.background_image ? data.movie.background_image : ''
 
-        if(window.innerWidth > 790 && background && !Storage.field('light_version') && Storage.field('background_type') !== 'poster'){
+        if(window.innerWidth > 790 && background && !Storage.field('light_version')){
             background_image = html.find('.full-start__background')[0] || {}
 
             background_image.onload = function(e){
@@ -264,7 +274,11 @@ function component(object){
     }
 
     this.start = function(){
-        if(items.length && Activity.active().activity == this.activity) items[0].toggleBackground()
+        if(items.length && Activity.active().activity == this.activity){
+            if(loaded_data) Activity.active().card = loaded_data.movie //на всякий пожарный :D
+
+            items[0].toggleBackground()
+        } 
 
         Controller.add('content',{
             update: ()=>{},

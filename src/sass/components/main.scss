@@ -94,6 +94,14 @@ body{
 
 	&.black--style{
 		background: #000;
+
+		@media screen and (max-width: $media_xm) {
+			.selectbox__content,
+			.modal__content,
+			.settings__content{
+				background-color: #000 !important;
+			}
+		}
 	}
 }
 
@@ -177,6 +185,25 @@ body.no--animation .background canvas{
 	}
 }
 
+.content-loading{
+	position: relative;
+	padding: 5em 0;
+
+	&::after{
+		content: '';
+		display: block;
+		height: 3em;
+		width: 3em;
+		background: url(../img/loader.svg) no-repeat 50% 50%;
+		background-size: contain;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-left: -1.5em;
+		margin-top: -1.5em;
+	}
+}
+
 body.platform--browser .normalization{
 	backdrop-filter: blur(5px);
 }
@@ -209,6 +236,13 @@ body.ambience--enable{
 .overhide{
 	overflow: hidden;
 }
+
+/* Фикс для orsay */
+.online-prestige-watched__icon{
+	width: 1.5em;
+    height: 1.5em;
+}
+
 
 @keyframes head-icon-blick {
 	0% {

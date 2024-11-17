@@ -146,7 +146,7 @@ function Card(data, params = {}){
             if(vote > 0){
                 let vote_elem = document.createElement('div')
                     vote_elem.classList.add('card__vote')
-                    vote_elem.innerText = vote
+                    vote_elem.innerText = vote >= 10 ? 10 : vote
 
                 this.card.querySelector('.card__view').appendChild(vote_elem)
             }
@@ -236,25 +236,32 @@ function Card(data, params = {}){
                 })
 
                 if(viewed){
+                    let soon = []
                     let next = episodes.slice(episodes.indexOf(viewed.ep)).filter(ep=>ep.air_date).filter(ep=>{
                         let date = Utils.parseToDate(ep.air_date).getTime()
+
+                        if(date > Date.now()) soon.push(ep)
 
                         return date < Date.now()
                     }).slice(0,5)
 
                     if(next.length == 0) next = [viewed.ep]
 
+                    if(soon.length) next.push(soon[0])
+
                     let wrap = Template.js('card_watched',{})
-                        //wrap.querySelector('.card-watched__title').innerText = Lang.translate('title_watched')
 
                     next.forEach(ep=>{
-                        let div = document.createElement('div')
+                        let div  = document.createElement('div')
                         let span = document.createElement('span')
+                        let date = Utils.parseToDate(ep.air_date)
+                        let now  = Date.now()
+                        let days = Math.ceil((date.getTime() - now)/(24*60*60*1000))
 
                         div.classList.add('card-watched__item')
                         div.appendChild(span)
 
-                        span.innerText = ep.episode_number+' - '+(ep.name || Lang.translate('noname'))
+                        span.innerText = ep.episode_number + ' - ' + (days > 0 ? Lang.translate('full_episode_days_left') + ': ' + days : (ep.name || Lang.translate('noname')))
 
                         if(ep == viewed.ep) div.appendChild(Timeline.render(viewed.view)[0])
 
@@ -286,7 +293,7 @@ function Card(data, params = {}){
         if(status.book) this.addicon('book')
         if(status.like) this.addicon('like')
         if(status.wath) this.addicon('wath')
-        if(status.history) this.addicon('history')
+        if(status.history || Timeline.watched(data)) this.addicon('history')
 
         let any_marker = marks.find(m=>status[m])
 

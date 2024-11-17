@@ -66,6 +66,20 @@ let html = `<div>
         <div class="settings-param__value"></div>
     </div>
 
+    <div class="is--sound">
+        <div class="settings-param-title"><span>#{settings_interface_sound}</span></div>
+
+        <div class="settings-param selector" data-type="toggle" data-name="interface_sound_play">
+            <div class="settings-param__name">#{settings_interface_sound_play}</div>
+            <div class="settings-param__value"></div>
+        </div>
+
+        <div class="settings-param selector" data-type="select" data-name="interface_sound_level">
+            <div class="settings-param__name">#{settings_interface_sound_level}</div>
+            <div class="settings-param__value"></div>
+        </div>
+    </div>
+
     <div class="settings-param-title"><span>#{settings_interface_performance}</span></div>
 
 
@@ -73,6 +87,11 @@ let html = `<div>
         <div class="settings-param__name">#{settings_interface_animation}</div>
         <div class="settings-param__value"></div>
         <div class="settings-param__descr">#{settings_interface_animation_descr}</div>
+    </div>
+
+    <div class="settings-param selector" data-type="toggle" data-name="advanced_animation">
+        <div class="settings-param__name">#{settings_interface_advanced_animation}</div>
+        <div class="settings-param__value"></div>
     </div>
 
     <div class="settings-param selector" data-type="toggle" data-name="mask">

@@ -46,7 +46,7 @@ function create(persons, params){
 
         let person = Template.get('full_person',{
             name: element.name,
-            role: element.character || element.job
+            role: element.character || element.job || Lang.translate('title_actor')
         })
 
         person.on('visible',()=>{
@@ -72,7 +72,7 @@ function create(persons, params){
         }).on('hover:enter',()=>{
             Activity.push({
                 url: element.url,
-                title: Lang.translate('title_person'),
+                title: Lang.translate('title_persons'),
                 component: 'actor',
                 id: element.id,
                 source: params.object.source

@@ -33,6 +33,8 @@ import player from '../templates/player'
 import player_panel from '../templates/player/panel'
 import player_video from '../templates/player/video'
 import player_info from '../templates/player/info'
+import player_footer from '../templates/player/footer'
+import player_footer_card from '../templates/player/footer/card'
 import selectbox from '../templates/selectbox/box'
 import selectbox_item from '../templates/selectbox/item'
 import selectbox_icon from '../templates/selectbox/icon'
@@ -69,6 +71,7 @@ import console from '../templates/console'
 import icon_star from '../templates/icons/star'
 import icon_viewed from '../templates/icons/viewed'
 import icon_lock from '../templates/icons/lock'
+import icon_like from '../templates/icons/like'
 import timeline from '../templates/timeline'
 import timeline_details from '../templates/timeline_details'
 import list_empty from '../templates/list_empty'
@@ -99,6 +102,9 @@ import feed_head from '../templates/feed/head'
 import feed_episode from '../templates/feed/episode'
 import register from '../templates/register'
 import speedtest from '../templates/speedtest'
+import discuss_rules from '../templates/discuss_rules'
+import bookmarks_folder from '../templates/bookmarks_folder'
+
 
 let templates = {
     head,
@@ -134,6 +140,8 @@ let templates = {
     player_panel,
     player_video,
     player_info,
+    player_footer,
+    player_footer_card,
     selectbox,
     selectbox_item,
     info,
@@ -166,6 +174,7 @@ let templates = {
     icon_star,
     icon_viewed,
     icon_lock,
+    icon_like,
     timeline,
     timeline_details,
     list_empty,
@@ -200,6 +209,8 @@ let templates = {
     season_episode,
     season_episode_rate,
     season_info,
+    discuss_rules,
+    bookmarks_folder
 }
 
 let created = {}

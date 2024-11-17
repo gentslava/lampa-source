@@ -4,7 +4,7 @@ let list_opened   = false
 let logs          = true
 
 function reguest(params, callback){
-    if(params.ffprobe){
+    if(params.ffprobe && params.path.split('.').pop() !== 'mp4'){
         setTimeout(()=>{
             callback({streams: params.ffprobe})
         },200)

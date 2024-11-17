@@ -29,7 +29,9 @@ function url(u, params = {}){
         }
     }
 
-    return baseurl + u
+    let email = Storage.get('account','{}').email || ''
+
+    return Utils.addUrlComponent(baseurl + u, 'email=' + encodeURIComponent(email))
 }
 
 function add(u, params){
@@ -359,7 +361,9 @@ function full(params, oncomplite, onerror){
 
     if(Utils.dcma(params.method, params.id)) return onerror()
 
-    get('3/'+params.method+'/'+params.id+'?api_key='+TMDBApi.key()+'&append_to_response=content_ratings,release_dates,keywords&language='+Storage.field('tmdb_lang'),params,(json)=>{
+    get('3/'+params.method+'/'+params.id+'?api_key='+TMDBApi.key()+'&append_to_response=content_ratings,release_dates,keywords,alternative_titles&language='+Storage.field('tmdb_lang'),params,(json)=>{
+        if(json.status_code) return status.stop(),onerror()
+
         json.source = 'tmdb'
 
         if(params.method == 'tv'){
@@ -406,6 +410,14 @@ function full(params, oncomplite, onerror){
     reactionsGet(params, (json)=>{
         status.append('reactions', json)
     })
+
+    if(Lang.selected(['ru','uk','be'])){
+        status.need++
+
+        discussGet(params, (json)=>{
+            status.append('discuss', json)
+        },status.error.bind(status))
+    }
 }
 
 function trailers(type, oncomplite){
@@ -430,6 +442,10 @@ function reactionsGet(params, oncomplite){
     network.silent(Utils.protocol() + Manifest.cub_domain + '/api/reactions/get/' + params.method + '_' + params.id, oncomplite,()=>{
         oncomplite({result: []})
     })
+}
+
+function discussGet(params, oncomplite, onerror){
+    network.silent(Utils.protocol() + Manifest.cub_domain + '/api/discuss/get/'+params.method+'_'+params.id+'/' + (params.page || 1) + '/' + Storage.field('language'), oncomplite, onerror)
 }
 
 function reactionsAdd(params, oncomplite, onerror){
@@ -560,5 +576,6 @@ export default {
     menuCategory,
     discovery,
     reactionsGet,
-    reactionsAdd
+    reactionsAdd,
+    discussGet
 }

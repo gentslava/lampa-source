@@ -3,6 +3,7 @@ import Scroll from './scroll'
 import Controller from './controller'
 import Utils from '../utils/math'
 import DeviceInput from '../utils/device_input'
+import Activity from './activity'
 
 let html
 let scroll
@@ -15,7 +16,15 @@ function init(){
     html.find('.selectbox__body').append(scroll.render())
 
     html.find('.selectbox__layer').on('click',(e)=>{
-        if(DeviceInput.canClick(e.originalEvent)) window.history.back()
+        if(DeviceInput.canClick(e.originalEvent)) Controller.back()
+    })
+
+    scroll.addSwipeDown(()=>{
+        html.addClass('animate-down')
+
+        setTimeout(()=>{
+            Controller.back()
+        },200)
     })
 
     $('body').append(html)
@@ -98,6 +107,8 @@ function bind(){
 
         scroll.append(item)
     })
+
+    if(active.onFullDraw) active.onFullDraw(scroll)
 }
 
 function show(object){
@@ -107,7 +118,11 @@ function show(object){
 
     $('body').toggleClass('selectbox--open',true)
 
-    html.find('.selectbox__body').addClass('layer--wheight').data('mheight', html.find('.selectbox__head'))
+    html.find('.selectbox__body').addClass('layer--wheight').css('max-height', window.innerWidth <= 480 ? window.innerHeight * 0.6 : 'unset').data('mheight', html.find('.selectbox__head'))
+
+    html.addClass('animate')
+
+    Activity.mixState('select=open')
 
     toggle()
 }
@@ -135,10 +150,14 @@ function toggle(){
 
 function hide(){
     $('body').toggleClass('selectbox--open',false)
+
+    html.removeClass('animate animate-down')
 }
 
 function close(){
     hide()
+
+    Activity.mixState()
 
     if(active.onBack) active.onBack()
 }

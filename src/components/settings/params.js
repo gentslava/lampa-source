@@ -75,13 +75,12 @@ function init(){
         }, 'android')
 
         select('player_torrent', {
-            'inner': '#{settings_param_player_inner}',
             'android': 'Android'
         }, 'android')
 
         trigger('internal_torrclient', false)
     }
-    else if(Platform.desktop()){
+    else if(Platform.desktop() && !Platform.macOS()){
         select('player',{
             'inner': '#{settings_param_player_inner}',
             'other': '#{settings_param_player_outside}',
@@ -95,6 +94,31 @@ function init(){
         select('player_torrent',{
             'inner': '#{settings_param_player_inner}',
             'other': '#{settings_param_player_outside}',
+        },'inner')
+    }
+    else if(Platform.macOS()){
+        select('player',{
+            'inner': '#{settings_param_player_inner}',
+            'iina': 'IINA',
+            'infuse': 'Infuse',
+            'mpv': 'MPV',
+            'nplayer': 'nPlayer',
+        },'inner')
+
+        select('player_iptv',{
+            'inner': '#{settings_param_player_inner}',
+            'iina': 'IINA',
+            'infuse': 'Infuse',
+            'mpv': 'MPV',
+            'nplayer': 'nPlayer',
+        },'inner')
+
+        select('player_torrent',{
+            'inner': '#{settings_param_player_inner}',
+            'iina': 'IINA',
+            'infuse': 'Infuse',
+            'mpv': 'MPV',
+            'nplayer': 'nPlayer',
         },'inner')
     }
     else if(Platform.is('apple')){
@@ -152,6 +176,7 @@ function init(){
     }
 
     trigger('glass_style', Platform.screen('mobile'))
+    trigger('advanced_animation', Platform.is('apple_tv') || Platform.is('browser') || Platform.desktop() || navigator.userAgent.toLowerCase().indexOf('shield') >= 0)
 
     let screensaver_types = {
         'nature': '#{settings_param_screensaver_nature}',
@@ -165,7 +190,7 @@ function init(){
     select('keyboard_type', {
         'lampa': '#{settings_param_keyboard_lampa}',
         'integrate': '#{settings_param_keyboard_system}'
-    }, Platform.screen('mobile') || Platform.is('apple_tv') ? 'integrate' : 'lampa')
+    }, Platform.screen('mobile') || Platform.is('apple_tv') || Platform.macOS() ? 'integrate' : 'lampa')
 
 
     //язык и комбинации для поиска
@@ -433,7 +458,8 @@ select('poster_size',{
 
 select('parser_torrent_type',{
     'jackett': 'Jackett',
-    'prowlarr': 'Prowlarr'
+    'prowlarr': 'Prowlarr',
+    'torrserver': 'TorrServer'
 },'jackett')
 
 select('jackett_interview',{
@@ -572,6 +598,13 @@ select('glass_opacity', {
     'blacked': '#{settings_param_glass_blacked}'
 }, 'easy')
 
+select('interface_sound_level', {
+    '100': '100',
+    '80': '80',
+    '60': '60',
+    '40': '40',
+    '20': '20',
+}, '60')
 
 select('time_offset', {
     'n-10': '-10',
@@ -647,6 +680,7 @@ trigger('hide_outside_the_screen', true)
 trigger('card_interfice_cover', true)
 trigger('card_interfice_reactions', true)
 trigger('cache_images', false)
+trigger('interface_sound_play', false)
 
 
 

@@ -1,13 +1,26 @@
+@mixin no-glass{
+    @media screen and (max-width: $media_xm) {
+        .selectbox__content,
+        .modal__content,
+        .settings__content{
+            background-color: #262829;
+        }
+    }
+}
+
 body.glass--style{
     .selectbox__content,
     .settings__content,
     .settings-input__content,
     .modal__content,
     .settings-input--free,
-    .navigation-bar__body{
+    .navigation-bar__body,
+    .discuss-rules{
         background-color: rgba(0,0,0,0.3);
         backdrop-filter: blur(1.6em);
     }
+
+    @include no-glass;
 
     .selectbox-item,
     .settings-folder,
@@ -56,7 +69,8 @@ body.glass--style{
         }
     }
 
-    .card-more__box{
+    .card-more__box,
+    .bookmarks-folder__layer{
         background: rgba(0,0,0,0.3);
     }
 
@@ -74,11 +88,14 @@ body.glass--style{
 
             .player-panel,
             .player-info,
+            .player-footer,
             .player-video__paused,
             .player-video__loader,
             .normalization{
                 background-color: rgba(0,0,0,0.6);
             }
+
+            @include no-glass;
         }
 
         &--blacked{
@@ -94,10 +111,49 @@ body.glass--style{
 
             .player-panel,
             .player-info,
+            .player-footer,
             .player-video__paused,
             .player-video__loader,
             .normalization{
                 background-color: rgba(0,0,0,0.85);
+            }
+
+            @include no-glass;
+        }
+    }
+
+    &.platform--browser,
+    &.platform--nw,
+    &.platform--apple{
+        .card .card__icons-inner,
+        .card .card__marker,
+        .card .card__vote,
+        .card .card-watched{
+            background-color: rgba(0,0,0,0.3);
+            backdrop-filter: blur(1em);
+        }
+
+        .card-watched__item{
+            color: #fff;
+
+            &:nth-child(2){
+                opacity: 0.8;
+            }
+            &:nth-child(3){
+                opacity: 0.6;
+            }
+            &:nth-child(4){
+                opacity: 0.4;
+            }
+            &:nth-child(5){
+                opacity: 0.2;
+            }
+        }
+
+        .head__action{
+            &:not(.focus){
+                background-color: rgba(0,0,0,0.06);
+                backdrop-filter: blur(1em);
             }
         }
     }
