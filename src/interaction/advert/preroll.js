@@ -165,7 +165,7 @@ function show(data, call){
 
     Metric.counter('ad_preroll_start', VPN.code(), whoi, type.any ? 'skip' : 'show')
 
-    if(type.any){
+    if(type.any && !player_data.vast_url){
         console.log('Ad', 'preroll skipped, no vast api or iptv/torrent/youtube/continue', type)
 
         return call()
