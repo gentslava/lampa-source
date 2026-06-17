@@ -175,7 +175,7 @@ function show(data, call){
 
     Metric.counter('ad_preroll_start', VPN.code(), whoi, type.any ? 'skip' : 'show')
 
-    if(type.any && !player_data.vast_url){
+    if(type.any){
         console.log('Ad', 'preroll skipped, no vast api or iptv/torrent/youtube/continue', type)
 
         return call()
@@ -198,7 +198,7 @@ function show(data, call){
 
     // Получаем данные для показа рекламы (преролл или плагин)
     let preroll = getAnyPreroll(true)
-    let canshow = IMA.canShow(data) || player_data.vast_url
+    let canshow = IMA.canShow(data)
 
     Metric.counter('ad_preroll_show', VPN.code(), preroll ? 'ready' : 'none', canshow ? 'ready' : 'none')
     Metric.counter('ad_preroll_colling', VPN.code(), Manager.coolingReady() ? 'ready' : 'cooling')
