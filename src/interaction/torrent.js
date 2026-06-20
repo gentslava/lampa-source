@@ -405,7 +405,13 @@ function list(items, params){
 
         element.playlist = playlist
 
-        playlist.push(element)
+        playlist.push({
+            title: element.title,
+            url: element.url,
+            timeline: element.timeline,
+            thumbnail: element.thumbnail,
+            subtitles: element.subtitles
+        })
         
         item.on('hover:enter',()=>{
             stopAutostart()
@@ -414,21 +420,6 @@ function list(items, params){
             if(navigator.userAgent.toLowerCase().indexOf('android') >= 0 && !Platform.is('android')) return Platform.install('apk')
 
             if(params.movie.id) Favorite.add('history', params.movie, 100)
-
-            if ((Platform.is('android') || Platform.is('apple_tv') || Platform.is('apple') || Platform.macOS()) && playlist.length > 1){
-                let trim_playlist = []
-
-                playlist.forEach((elem)=>{
-                    trim_playlist.push({
-                        title: elem.title,
-                        url: elem.url,
-                        timeline: elem.timeline,
-                        thumbnail: elem.thumbnail,
-                    })
-                })
-
-                element.playlist = trim_playlist
-            }
 
             preload(element, ()=>{
                 Player.play(element)
