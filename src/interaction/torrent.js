@@ -403,6 +403,8 @@ function list(items, params){
 
         element.title = (element.fname || element.title).replace(/<[^>]*>?/gm, '')
 
+        element.playlist = playlist
+
         playlist.push(element)
         
         item.on('hover:enter',()=>{
