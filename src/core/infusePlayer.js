@@ -34,6 +34,24 @@ function sanitizeStreamUrl(url) {
     return String(url || '').replace('&preload', '&play').replace(/\s/g, '%20')
 }
 
+function normalizePlayData(data) {
+    if (!data) return data
+
+    if (typeof data.url === 'string') {
+        data.url = data.url.replace('&preload', '&play')
+    }
+
+    if (Array.isArray(data.playlist)) {
+        data.playlist.forEach((item) => {
+            if (item && typeof item.url === 'string') {
+                item.url = item.url.replace('&preload', '&play')
+            }
+        })
+    }
+
+    return data
+}
+
 function compareStreamUrl(a, b) {
     if (!a || !b) return false
 
@@ -513,6 +531,7 @@ function buildFallbackUrl(data, callbacks) {
  * Полный URL для Infuse: save_and_play + filenames, иначе простой play?url=…
  */
 function resolveUrl(data, callbacks) {
+    normalizePlayData(data)
     callbacks = resolveCallbacks(callbacks)
 
     return buildExternalUrl(data, callbacks) || buildFallbackUrl(data, callbacks)
