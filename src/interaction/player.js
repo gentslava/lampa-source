@@ -45,6 +45,8 @@ let preloader = {
     wait: false
 }
 
+let play_pending = null
+
 let viewing = {
     time: 0,
     difference: 0,
@@ -735,8 +737,7 @@ function externalPlayer(player_need, data, players, infuseCallbacks){
 
         if(customUrl) return customUrl
 
-        let infuseUrl = InfusePlayer.buildExternalUrl(data, infuseCallbacks)
-        if(infuseUrl) return infuseUrl
+        return InfusePlayer.resolveUrl(data, infuseCallbacks)
     }
 
     return players[player]
@@ -817,7 +818,6 @@ function start(data, need, inner){
         let external_url = externalPlayer(player_need, data, {
             vlc:        'vlc://${furl}',
             nplayer:    'nplayer-${furl}',
-            infuse:     'infuse://x-callback-url/play?url=${url}',
             senplayer:  'senplayer://x-callback-url/play?url=${url}',
             vidhub:     'open-vidhub://x-callback-url/open?&url=${url}',
             svplayer:   'svplayer://x-callback-url/stream?url=${url}',
@@ -842,8 +842,7 @@ function start(data, need, inner){
         let external_url = externalPlayer(player_need, data, {
             mpv:    'mpv://${_url}',
             iina:   'iina://weblink?url=${url}',
-            nplayer:'nplayer-${_url}',
-            infuse: 'infuse://x-callback-url/play?url=${url}'
+            nplayer:'nplayer-${_url}'
         })
 
         if (external_url) {
@@ -856,10 +855,8 @@ function start(data, need, inner){
         else launchInner()
     }
     else if(Platform.is('apple_tv')){
-        let apple_tv_client = Storage.field('apple_tv_client') ?? 'lampa';
         let external_url = externalPlayer(player_need, data, {
             vlc:        'vlc-x-callback://x-callback-url/stream?url=${url}',
-            infuse:     `infuse://x-callback-url/play?x-success=${apple_tv_client}://infuseDidFinish&x-error=${apple_tv_client}://infuseDidFail&url=\${url}&playlist=\${playlist}`,
             senplayer:  'SenPlayer://x-callback-url/play?url=${url}',
             vidhub:     'open-vidhub://x-callback-url/open?url=${url}',
             svplayer:   'svplayer://x-callback-url/stream?url=${url}',
@@ -868,9 +865,6 @@ function start(data, need, inner){
             tvos:       'lampa://video?player=tvos&src=${url}&playlist=${playlist}&segments=${segments}',
             tvosl:      'lampa://video?player=tvosav&src=${url}&playlist=${playlist}&segments=${segments}',
             tvosSelect: 'lampa://video?player=lists&src=${url}&playlist=${playlist}&segments=${segments}'
-        }, {
-            x_success: `${apple_tv_client}://infuseDidFinish`,
-            x_error: `${apple_tv_client}://infuseDidFail`
         })
 
         if (external_url) {
@@ -1029,7 +1023,8 @@ function play(data){
 
                 Playlist.url(data.url)
 
-                Playlist.set(Playlist.get()) //надо повторно отправить, а то после рекламы неправильно показывает
+                if(data.playlist && data.playlist.length) Playlist.set(data.playlist)
+                else Playlist.set(Playlist.get()) //надо повторно отправить, а то после рекламы неправильно показывает
 
                 Panel.quality(data.quality,data.url)
 
@@ -1074,7 +1069,14 @@ function play(data){
         })
     }
 
-    start(data, data.torrent_hash ? 'torrent' : '', lauch)
+    play_pending = data
+
+    setTimeout(()=>{
+        if(!play_pending) return
+
+        start(play_pending, play_pending.torrent_hash ? 'torrent' : '', lauch)
+        play_pending = null
+    }, 0)
 
     launch_player = ''
 }
@@ -1137,7 +1139,9 @@ function stat(url){
  */
 
 function playlist(playlist){
-    if(work || preloader.wait || wait_for_disclaimer) Playlist.set(playlist)
+    if(play_pending && !play_pending.playlist) play_pending.playlist = playlist
+
+    if(play_pending || work || preloader.wait || wait_for_disclaimer) Playlist.set(playlist)
 }
 
 /**

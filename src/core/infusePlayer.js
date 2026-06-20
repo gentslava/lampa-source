@@ -1,16 +1,17 @@
 import Storage from './storage/storage'
 import Platform from './platform'
 import Utils from '../utils/utils'
+import Activity from '../interaction/activity/activity'
 
 const SAVE_PREFIX = 'infuse://x-callback-url/save?'
 const PLAY_PREFIX = 'infuse://x-callback-url/play?'
-const SEASON_EPISODE_RE = /\[S(\d+):E(\d+)\]/
+const SEASON_EPISODE_RE = /\[S(\d+):E(\d+)\]/i
 
 const DEFAULTS = {
     mode: 'save_and_play',
     seasonOnly: true,
     maxItems: 40,
-    maxUrlLength: 12000
+    maxUrlLength: 65536
 }
 
 function parsePositiveInt(value) {
@@ -33,21 +34,108 @@ function sanitizeStreamUrl(url) {
     return String(url || '').replace('&preload', '&play').replace(/\s/g, '%20')
 }
 
+function compareStreamUrl(a, b) {
+    if (!a || !b) return false
+
+    a = sanitizeStreamUrl(a)
+    b = sanitizeStreamUrl(b)
+
+    if (a === b) return true
+
+    return a.split('?')[0] === b.split('?')[0]
+}
+
 function parseEpisodeMeta(item) {
     if (!item) return { season: null, episode: null }
 
     let season = parsePositiveInt(item.season != null ? item.season : item.season_number)
     let episode = parsePositiveInt(item.episode != null ? item.episode : item.episode_number)
 
+    if ((!season || !episode) && item.subtitle) {
+        let subtitle = stripText(item.subtitle)
+        let episodeMatch = subtitle.match(/(\d+)\s*$/)
+        if (!episode) episode = parsePositiveInt(episodeMatch && episodeMatch[1])
+    }
+
     if ((!season || !episode) && item.title) {
-        let match = String(item.title).match(SEASON_EPISODE_RE)
+        let title = String(item.title)
+        let match = title.match(SEASON_EPISODE_RE)
+
         if (match) {
             if (!season) season = parsePositiveInt(match[1])
             if (!episode) episode = parsePositiveInt(match[2])
         }
+        else if (!episode) {
+            let episodeMatch = title.match(/^(\d+)\s*\//) || title.match(/(?:^|\s)(\d{1,3})\s*[-–]\s/)
+            if (episodeMatch) episode = parsePositiveInt(episodeMatch[1])
+        }
     }
 
     return { season, episode }
+}
+
+function getRawPlaylist(data) {
+    if (!data || !Array.isArray(data.playlist)) return []
+    return data.playlist.filter((item) => item && !item.separator)
+}
+
+function enrichPlayItem(data, item) {
+    item = item || {}
+    let fromItem = parseEpisodeMeta(item)
+    let patch = {}
+
+    if (item.season == null && fromItem.season != null) patch.season = fromItem.season
+    else if (item.season == null && data && data.season != null) patch.season = data.season
+
+    if (item.episode == null && fromItem.episode != null) patch.episode = fromItem.episode
+
+    if (!Object.keys(patch).length) return item
+
+    return Object.assign({}, item, patch)
+}
+
+function normalizePlaylistItem(data, item) {
+    return enrichPlayItem(data, item)
+}
+
+function resolvePlaylist(data) {
+    let playlist = getRawPlaylist(data)
+
+    if (!playlist.length) {
+        if (data && data.url) return [normalizePlaylistItem(data, data)]
+        return []
+    }
+
+    return playlist.map((item) => normalizePlaylistItem(data, item))
+}
+
+function findPlayItem(data, playlist) {
+    playlist = playlist || resolvePlaylist(data)
+
+    if (!playlist.length) return data
+
+    let currentUrl = data && data.url ? sanitizeStreamUrl(data.url) : ''
+
+    if (currentUrl) {
+        for (let i = 0; i < playlist.length; i++) {
+            if (compareStreamUrl(playlist[i].url, currentUrl)) return playlist[i]
+        }
+    }
+
+    let dataMeta = parseEpisodeMeta(data)
+
+    if (dataMeta.episode != null) {
+        for (let i = 0; i < playlist.length; i++) {
+            let meta = parseEpisodeMeta(playlist[i])
+
+            if (dataMeta.episode !== meta.episode) continue
+            if (dataMeta.season != null && meta.season != null && dataMeta.season !== meta.season) continue
+
+            return playlist[i]
+        }
+    }
+
+    return data
 }
 
 function normalizeLaunchMode(mode) {
@@ -76,16 +164,30 @@ function resolveOptions(data, callbacks = {}) {
 }
 
 function getExtension(item) {
-    if (!item || typeof item.url !== 'string') return '.m3u8'
-    let path = item.url.split('?')[0].split('#')[0]
+    if (!item || typeof item.url !== 'string') return '.mkv'
+
+    let path = item.url.split('?')[0].split('#')[0].toLowerCase()
     let extMatch = /\.([a-z0-9]{2,5})$/i.exec(path)
-    return extMatch ? ('.' + extMatch[1].toLowerCase()) : '.m3u8'
+
+    if (extMatch) return '.' + extMatch[1].toLowerCase()
+
+    return '.mkv'
+}
+
+function resolveCard(data) {
+    if (data && (data.card || data.movie)) return data.card || data.movie
+
+    let activity = Activity.active()
+
+    if (activity && (activity.card || activity.movie)) return activity.card || activity.movie
+
+    return null
 }
 
 function getHumanTitle(movie) {
-    if (!movie) return 'Media'
+    if (!movie) return ''
     let rawTitle = (movie.original_name || movie.original_title || movie.name || movie.title || '').trim()
-    return stripText(rawTitle) || 'Media'
+    return stripText(rawTitle) || ''
 }
 
 function getMovieYear(movie) {
@@ -105,7 +207,13 @@ function formatSourceLabel(raw) {
     name = name.replace(/[^\w\u0400-\u04FF.-]+/g, ' ').replace(/\s+/g, ' ').trim()
     if (!name) return ''
 
-    return name.split(/\s+/)[0]
+    let first = name.split(/\s+/)[0]
+
+    if (first.endsWith("'s") || first.endsWith('s')) {
+        first = first.replace(/['']s$/i, '').replace(/s$/i, '')
+    }
+
+    return first || name.split(/\s+/)[0]
 }
 
 function formatVoiceLabel(item, isSeries, humanTitle) {
@@ -214,51 +322,75 @@ function buildAppleTvPlayUrl(links, resumePosition, callbacks) {
     return infuseUrl
 }
 
-function buildLaunchUrl(links, data, options) {
-    if (!links.length) return ''
+function buildLaunchUrl(saveLinks, playLinks, data, options) {
+    if (!saveLinks.length) return ''
+
+    playLinks = playLinks && playLinks.length ? playLinks : saveLinks
 
     options = options || {}
     let mode = normalizeLaunchMode(options.mode)
     let resumePosition = getResumePosition(data)
 
     if (Platform.is('apple_tv') === true) {
-        let appleTvClient = Storage.field('apple_tv_client') ?? 'lampa'
-        let tvPlayUrl = buildAppleTvPlayUrl(links, resumePosition, {
-            x_success: options.x_success || (appleTvClient + '://infuseDidFinish'),
-            x_error: options.x_error || (appleTvClient + '://infuseDidFail')
-        })
+        let tvPlayUrl = buildAppleTvPlayUrl(playLinks, resumePosition, resolveCallbacks(options))
 
         if (mode === 'play') return tvPlayUrl
-        if (mode === 'save') return SAVE_PREFIX + buildSaveQuery(links)
+        if (mode === 'save') return SAVE_PREFIX + buildSaveQuery(saveLinks)
 
-        return SAVE_PREFIX + buildSaveQuery(links) + '&x-success=' + encodeURIComponent(tvPlayUrl)
+        return SAVE_PREFIX + buildSaveQuery(saveLinks) + '&x-success=' + encodeURIComponent(tvPlayUrl)
     }
 
     if (mode === 'save') {
-        return SAVE_PREFIX + buildSaveQuery(links)
+        return SAVE_PREFIX + buildSaveQuery(saveLinks)
     }
 
-    let playUrl = PLAY_PREFIX + buildPlayQuery(links, resumePosition)
+    let playUrl = PLAY_PREFIX + buildPlayQuery(playLinks, resumePosition)
     if (mode === 'play') return playUrl
 
-    return SAVE_PREFIX + buildSaveQuery(links) + '&x-success=' + encodeURIComponent(playUrl)
+    return SAVE_PREFIX + buildSaveQuery(saveLinks) + '&x-success=' + encodeURIComponent(playUrl)
+}
+
+function buildLaunchUrlLength(saveLinks, playLinks, data, options) {
+    return buildLaunchUrl(saveLinks, playLinks, data, options).length
 }
 
 function getPlaylistItems(data) {
-    let playlist = Array.isArray(data.playlist) ? data.playlist : []
-    return playlist.filter((item) => item && !item.separator && typeof item.url === 'string')
+    return resolvePlaylist(data).filter((item) => typeof item.url === 'string')
 }
 
-function findStartIndex(items, currentUrl) {
-    if (!currentUrl) return 0
+function findStartIndex(items, data) {
+    if (!items.length) return 0
 
-    let target = sanitizeStreamUrl(currentUrl)
+    data = data || {}
 
-    for (let i = 0; i < items.length; i++) {
-        if (sanitizeStreamUrl(items[i].url) === target) return i
+    let currentUrl = data.url ? sanitizeStreamUrl(data.url) : ''
+
+    if (currentUrl) {
+        for (let i = 0; i < items.length; i++) {
+            if (compareStreamUrl(items[i].url, currentUrl)) return i
+        }
+    }
+
+    let dataMeta = parseEpisodeMeta(data)
+
+    if (dataMeta.episode != null) {
+        for (let i = 0; i < items.length; i++) {
+            let meta = parseEpisodeMeta(items[i])
+
+            if (dataMeta.episode !== meta.episode) continue
+            if (dataMeta.season != null && meta.season != null && dataMeta.season !== meta.season) continue
+
+            return i
+        }
     }
 
     return 0
+}
+
+function rotatePlayLinks(links, startIndex) {
+    if (!startIndex || startIndex <= 0 || startIndex >= links.length) return links
+
+    return links.slice(startIndex).concat(links.slice(0, startIndex))
 }
 
 function buildLink(url, item, movie, sourceName) {
@@ -271,8 +403,31 @@ function buildLink(url, item, movie, sourceName) {
     }
 }
 
+function buildLinksForItems(data, items, movie, source, options, launchMode, startIndex) {
+    startIndex = startIndex || 0
+    let links = []
+
+    for (let i = 0; i < items.length && links.length < options.maxItems; i++) {
+        let playItem = normalizePlaylistItem(data, items[i])
+        let link = buildLink(items[i].url, playItem, movie, source)
+        let nextSave = links.concat([link])
+        let nextPlay = rotatePlayLinks(nextSave, startIndex)
+        let probeLength = buildLaunchUrlLength(nextSave, nextPlay, data, {
+            mode: launchMode,
+            x_success: options.x_success,
+            x_error: options.x_error
+        })
+
+        if (probeLength > options.maxUrlLength && links.length) break
+
+        links.push(link)
+    }
+
+    return links
+}
+
 function buildLinksFromPlayData(data, movie, options) {
-    if (!data) return []
+    if (!data) return { saveLinks: [], playLinks: [] }
 
     options = options || resolveOptions(data)
     let source = formatSourceLabel(options.source)
@@ -281,41 +436,33 @@ function buildLinksFromPlayData(data, movie, options) {
 
     if (options.seasonOnly && options.season) {
         let targetSeason = options.season
-        items = items.filter((item) => parseEpisodeMeta(item).season === targetSeason)
-    }
-
-    let startIndex = findStartIndex(items, data.url)
-    if (startIndex > 0) items = items.slice(startIndex)
-
-    let links = []
-
-    for (let i = 0; i < items.length && links.length < options.maxItems; i++) {
-        let link = buildLink(items[i].url, items[i], movie, source)
-        let probe = buildLaunchUrl(links.concat([link]), data, {
-            mode: launchMode,
-            x_success: options.x_success,
-            x_error: options.x_error
+        items = items.filter((item) => {
+            let meta = parseEpisodeMeta(item)
+            if (meta.season == null && data.season != null) meta.season = data.season
+            return meta.season === targetSeason
         })
-
-        if (probe.length > options.maxUrlLength && links.length) break
-
-        links.push(link)
     }
 
-    if (!links.length && data.url) {
-        links.push(buildLink(data.url, data, movie, source))
+    let startIndex = findStartIndex(items, data)
+    let saveLinks = buildLinksForItems(data, items, movie, source, options, launchMode, startIndex)
+    let playLinks = rotatePlayLinks(saveLinks, startIndex)
+
+    if (!saveLinks.length && data.url) {
+        let link = buildLink(data.url, normalizePlaylistItem(data, findPlayItem(data)), movie, source)
+        saveLinks = [link]
+        playLinks = [link]
     }
 
-    return links
+    return { saveLinks, playLinks }
 }
 
 /**
  * Сборка infuse://x-callback-url/… для externalPlayer().
  *
  * data.url — текущий поток
- * data.playlist — эпизоды/версии (url: string)
- * data.card — TMDB-карточка (original_title, release_date…)
- * data.source — короткое имя источника для [скобок] в filename
+ * data.playlist — эпизоды/версии (season, episode, url)
+ * data.card — TMDB-карточка (optional; иначе Activity.active().card / .movie)
+ * data.source — короткое имя источника для [скобок] в filename (MODS, Filmix…)
  * data.infuse_mode — save | play | save_and_play (default)
  * data.season — фильтр плейлиста по сезону
  */
@@ -323,18 +470,63 @@ function buildExternalUrl(data, callbacks) {
     if (!data || !data.url) return null
 
     let options = resolveOptions(data, callbacks)
-    let links = buildLinksFromPlayData(data, data.card || null, options)
+    let { saveLinks, playLinks } = buildLinksFromPlayData(data, resolveCard(data), options)
 
-    if (!links.length) return null
+    if (!saveLinks.length) return null
 
-    return buildLaunchUrl(links, data, options)
+    return buildLaunchUrl(saveLinks, playLinks, data, options)
+}
+
+function resolveCallbacks(callbacks) {
+    callbacks = callbacks || {}
+    let appleTvClient = Storage.field('apple_tv_client') ?? 'lampa'
+
+    return {
+        x_success: callbacks.x_success || (appleTvClient + '://infuseDidFinish'),
+        x_error: callbacks.x_error || (appleTvClient + '://infuseDidFail')
+    }
+}
+
+function buildFallbackUrl(data, callbacks) {
+    if (!data || !data.url) return null
+
+    callbacks = resolveCallbacks(callbacks)
+
+    let url = sanitizeStreamUrl(data.url)
+
+    if (Platform.is('apple_tv') === true) {
+        let playlist = data.playlist ? encodeURIComponent(JSON.stringify(data.playlist)) : ''
+        let infuseUrl = PLAY_PREFIX
+            + 'x-success=' + encodeURIComponent(callbacks.x_success)
+            + '&x-error=' + encodeURIComponent(callbacks.x_error)
+            + '&url=' + encodeURIComponent(url)
+
+        if (playlist) infuseUrl += '&playlist=' + playlist
+
+        return infuseUrl
+    }
+
+    return PLAY_PREFIX + 'url=' + encodeURIComponent(url)
+}
+
+/**
+ * Полный URL для Infuse: save_and_play + filenames, иначе простой play?url=…
+ */
+function resolveUrl(data, callbacks) {
+    callbacks = resolveCallbacks(callbacks)
+
+    return buildExternalUrl(data, callbacks) || buildFallbackUrl(data, callbacks)
 }
 
 export default {
     buildExternalUrl,
+    buildFallbackUrl,
     buildLinksFromPlayData,
     buildLaunchUrl,
     generateFilename,
     formatSourceLabel,
-    resolveOptions
+    resolveCard,
+    resolveCallbacks,
+    resolveOptions,
+    resolveUrl
 }
