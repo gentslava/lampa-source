@@ -407,6 +407,7 @@ function list(items, params){
 
         playlist.push({
             title: element.title,
+            subtitle: element.episode ? Lang.translate('torrent_serial_episode') + ': ' + element.episode : '',
             url: element.url,
             timeline: element.timeline,
             thumbnail: element.thumbnail,
