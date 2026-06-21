@@ -501,6 +501,8 @@ function toggle(){
  */
 
 function backward(){
+    launch_player = ''
+
     destroy()
 
     if(callback) callback()
@@ -970,8 +972,6 @@ function start(data, need, inner){
         })
     }
     else launchInner()
-
-    launch_player = ''
 
     if(data.launch_player) delete data.launch_player
 }
