@@ -1113,12 +1113,9 @@ function play(data){
 
     if(launch_player) data.launch_player = launch_player
 
-    setTimeout(()=>{
-        if(!play_pending) return
-
-        start(play_pending, play_pending.torrent_hash ? 'torrent' : '', lauch)
-        play_pending = null
-    }, 0)
+    start(play_pending, play_pending.torrent_hash ? 'torrent' : '', lauch)
+    
+    play_pending = null
 }
 
 function iptv(data){
