@@ -25,6 +25,7 @@ import Preroll from './advert/preroll'
 import Footer from './player/footer'
 import Segments from './player/segments'
 import ExternalPlayer from '../core/externalPlayer.js'
+import InfusePlayer from '../core/infusePlayer.js'
 
 let html
 let listener = Subscribe()
@@ -43,6 +44,8 @@ let show_disclaimer = false
 let preloader = {
     wait: false
 }
+
+let play_pending = null
 
 let viewing = {
     time: 0,
@@ -722,59 +725,22 @@ function externalPlayer(player_need, data, players, infuseCallbacks){
         players[p] = players[p].replace('${url}', url).replace('${_url}', _url).replace('${furl}', furl).replace('${playlist}', playlist).replace('${segments}', segments)
     }
 
-    // Infuse multi-URL playlist support for x-callback-url
+    // Infuse: save_and_play, readable filenames, season playlist
     if(player == 'infuse'){
-        let multiUrl = buildInfuseMultiUrl(data, infuseCallbacks)
-        if(multiUrl) return multiUrl
+        let customUrl = null
+
+        listener.send('infuse_build_url', {
+            data,
+            callbacks: infuseCallbacks,
+            setUrl: (url) => { customUrl = url }
+        })
+
+        if(customUrl) return customUrl
+
+        return InfusePlayer.resolveUrl(data, infuseCallbacks)
     }
 
     return players[player]
-}
-
-function buildInfuseMultiUrl(data, callbacks){
-    callbacks = callbacks || {}
-
-    let items = (Array.isArray(data.playlist) ? data.playlist : [])
-        .filter(p => typeof p.url == 'string')
-
-    if(items.length <= 1) return null
-
-    let currentUrl = data.url.replace('&preload','&play')
-    let currentIndex = -1
-
-    for(let i = 0; i < items.length; i++){
-        if(items[i].url.replace('&preload','&play') === currentUrl){
-            currentIndex = i
-            break
-        }
-    }
-
-    if(currentIndex < 0) currentIndex = 0
-
-    let urlParts = []
-
-    for(let i = currentIndex; i < items.length; i++){
-        let item = items[i]
-        let itemUrl = encodeURIComponent(item.url.replace('&preload','&play'))
-        urlParts.push('url=' + itemUrl)
-
-        if(item.title){
-            let filename = Utils.clearHtmlTags(item.title).trim()
-            if(filename){
-                urlParts.push('filename=' + encodeURIComponent(filename))
-            }
-        }
-    }
-
-    if(callbacks.x_success){
-        urlParts.push('x-success=' + encodeURIComponent(callbacks.x_success))
-    }
-
-    if(callbacks.x_error){
-        urlParts.push('x-error=' + encodeURIComponent(callbacks.x_error))
-    }
-
-    return 'infuse://x-callback-url/play?' + urlParts.join('&')
 }
 
 function needInnerPlayerDisclaimer(player_need){
@@ -852,7 +818,6 @@ function start(data, need, inner){
         let external_url = externalPlayer(player_need, data, {
             vlc:        'vlc://${furl}',
             nplayer:    'nplayer-${furl}',
-            infuse:     'infuse://x-callback-url/play?url=${url}',
             senplayer:  'senplayer://x-callback-url/play?url=${url}',
             vidhub:     'open-vidhub://x-callback-url/open?&url=${url}',
             svplayer:   'svplayer://x-callback-url/stream?url=${url}',
@@ -877,8 +842,7 @@ function start(data, need, inner){
         let external_url = externalPlayer(player_need, data, {
             mpv:    'mpv://${_url}',
             iina:   'iina://weblink?url=${url}',
-            nplayer:'nplayer-${_url}',
-            infuse: 'infuse://x-callback-url/play?url=${url}'
+            nplayer:'nplayer-${_url}'
         })
 
         if (external_url) {
@@ -891,10 +855,8 @@ function start(data, need, inner){
         else launchInner()
     }
     else if(Platform.is('apple_tv')){
-        let apple_tv_client = Storage.field('apple_tv_client') ?? 'lampa';
         let external_url = externalPlayer(player_need, data, {
             vlc:        'vlc-x-callback://x-callback-url/stream?url=${url}',
-            infuse:     `infuse://x-callback-url/play?x-success=${apple_tv_client}://infuseDidFinish&x-error=${apple_tv_client}://infuseDidFail&url=\${url}&playlist=\${playlist}`,
             senplayer:  'SenPlayer://x-callback-url/play?url=${url}',
             vidhub:     'open-vidhub://x-callback-url/open?url=${url}',
             svplayer:   'svplayer://x-callback-url/stream?url=${url}',
@@ -903,9 +865,6 @@ function start(data, need, inner){
             tvos:       'lampa://video?player=tvos&src=${url}&playlist=${playlist}&segments=${segments}',
             tvosl:      'lampa://video?player=tvosav&src=${url}&playlist=${playlist}&segments=${segments}',
             tvosSelect: 'lampa://video?player=lists&src=${url}&playlist=${playlist}&segments=${segments}'
-        }, {
-            x_success: `${apple_tv_client}://infuseDidFinish`,
-            x_error: `${apple_tv_client}://infuseDidFail`
         })
 
         if (external_url) {
@@ -1064,7 +1023,8 @@ function play(data){
 
                 Playlist.url(data.url)
 
-                Playlist.set(Playlist.get()) //надо повторно отправить, а то после рекламы неправильно показывает
+                if(data.playlist && data.playlist.length) Playlist.set(data.playlist)
+                else Playlist.set(Playlist.get()) //надо повторно отправить, а то после рекламы неправильно показывает
 
                 Panel.quality(data.quality,data.url)
 
@@ -1109,7 +1069,14 @@ function play(data){
         })
     }
 
-    start(data, data.torrent_hash ? 'torrent' : '', lauch)
+    play_pending = data
+
+    setTimeout(()=>{
+        if(!play_pending) return
+
+        start(play_pending, play_pending.torrent_hash ? 'torrent' : '', lauch)
+        play_pending = null
+    }, 0)
 
     launch_player = ''
 }
@@ -1172,7 +1139,9 @@ function stat(url){
  */
 
 function playlist(playlist){
-    if(work || preloader.wait || wait_for_disclaimer) Playlist.set(playlist)
+    if(play_pending && !play_pending.playlist) play_pending.playlist = playlist
+
+    if(play_pending || work || preloader.wait || wait_for_disclaimer) Playlist.set(playlist)
 }
 
 /**
