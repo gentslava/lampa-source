@@ -1204,6 +1204,11 @@ export default {
     player_segments_value_auto: '自动跳过',
     player_segments_value_user: '自定义',
     player_segments_skiped: '片段已跳过',
+    player_segments_skip_now: '跳过',
+    player_segments_skip_in: '跳过倒计时',
+    player_segments_skip_intro: '跳过片头',
+    player_segments_next: '下一集',
+    player_segments_next_in: '下一集倒计时',
     subscribe_info: '在“订阅”部分，您可以查看所有翻译订阅。当您选择的翻译发布新剧集时，您将收到通知。',
     no_watch_history: '没有浏览历史记录',
 

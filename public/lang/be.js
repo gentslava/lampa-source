@@ -1269,6 +1269,11 @@ export default {
     player_segments_value_auto: 'Аўтапрапуск',
     player_segments_value_user: 'Карыстальніцкі',
     player_segments_skiped: 'Сегмент прапушчаны',
+    player_segments_skip_now: 'Прапусціць',
+    player_segments_skip_in: 'Прапуск праз',
+    player_segments_skip_intro: 'Прапусціць застаўку',
+    player_segments_next: 'Наступная серыя',
+    player_segments_next_in: 'Наступная серыя праз',
     subscribe_info: 'У раздзеле «Падпіскі» вы ўбачыце ўсе свае падпіскі на пераклады. Вы атрымаеце апавяшчэнне, калі выйдзе новая серыя з выбраным перакладам.',
     no_watch_history: 'Няма гісторыі прагляду',
 

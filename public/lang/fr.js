@@ -1253,6 +1253,11 @@ export default {
     player_segments_value_auto: 'Saut automatique',
     player_segments_value_user: 'Personnalisé',
     player_segments_skiped: 'Segment ignoré',
+    player_segments_skip_now: 'Ignorer',
+    player_segments_skip_in: 'Saut dans',
+    player_segments_skip_intro: 'Passer l\'intro',
+    player_segments_next: 'Épisode suivant',
+    player_segments_next_in: 'Épisode suivant dans',
     subscribe_info: 'Retrouvez vos abonnements ici. Notifications activées pour les nouvelles sorties.',
     no_watch_history: 'Aucun historique de visionnage',
 

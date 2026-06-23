@@ -987,6 +987,11 @@ export default {
     player_segments_value_auto:  'Auto pomijanie',
     player_segments_value_user:  'Użytkownik',
     player_segments_skiped:  'Segment pominięty',
+    player_segments_skip_now:  'Pomiń',
+    player_segments_skip_in:  'Pominięcie za',
+    player_segments_skip_intro:  'Pomiń intro',
+    player_segments_next:  'Następny odcinek',
+    player_segments_next_in:  'Następny odcinek za',
 
     broadcast_open:  'Otwórz kartę na innym urządzeniu',
     broadcast_play:  'Wybierz urządzenie do odtwarzania',

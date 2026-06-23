@@ -1253,6 +1253,11 @@ export default {
     player_segments_value_auto: 'Sari automat',
     player_segments_value_user: 'Personalizat',
     player_segments_skiped: 'Segment sărit',
+    player_segments_skip_now: 'Sari',
+    player_segments_skip_in: 'Sări peste în',
+    player_segments_skip_intro: 'Sari peste intro',
+    player_segments_next: 'Episodul următor',
+    player_segments_next_in: 'Episodul următor în',
     subscribe_info: 'În secțiunea Abonamente vei vedea toate traducerile urmărite.',
     no_watch_history: 'Niciun istoric de vizionare',
 

@@ -1254,6 +1254,11 @@ export default {
     player_segments_value_auto: 'Auto skip',
     player_segments_value_user: 'Custom',
     player_segments_skiped: 'Segment skipped',
+    player_segments_skip_now: 'Skip',
+    player_segments_skip_in: 'Skip in',
+    player_segments_skip_intro: 'Skip intro',
+    player_segments_next: 'Next episode',
+    player_segments_next_in: 'Next episode in',
     subscribe_info: 'In the Subscriptions section, you\'ll see all your translation subscriptions. You\'ll receive a notification when a new episode with your selected translation is released.',
     no_watch_history: 'No browsing history',
 

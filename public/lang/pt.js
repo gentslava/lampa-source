@@ -1239,6 +1239,11 @@ export default {
     player_segments_value_auto: 'Pular automaticamente',
     player_segments_value_user: 'Personalizado',
     player_segments_skiped: 'Segmento pulado',
+    player_segments_skip_now: 'Pular',
+    player_segments_skip_in: 'Pular em',
+    player_segments_skip_intro: 'Pular abertura',
+    player_segments_next: 'Próximo episódio',
+    player_segments_next_in: 'Próximo episódio em',
     subscribe_info: 'Na seção "Assinaturas", você verá todas as suas assinaturas de tradução. Você receberá uma notificação quando um novo episódio com sua tradução selecionada for lançado.',
     no_watch_history: 'Sem histórico de navegação',
 

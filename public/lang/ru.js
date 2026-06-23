@@ -987,6 +987,11 @@ export default {
     player_segments_value_auto: 'Автопропуск',
     player_segments_value_user: 'Пользовательский',
     player_segments_skiped: 'Cегмент пропущен',
+    player_segments_skip_now: 'Пропустить',
+    player_segments_skip_in: 'Пропуск через',
+    player_segments_skip_intro: 'Пропустить заставку',
+    player_segments_next: 'Следующая серия',
+    player_segments_next_in: 'Следующая серия через',
 
     broadcast_open: 'Открыть карточку на другом устройстве',
     broadcast_play: 'Выберите устройство для просмотра',

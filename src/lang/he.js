@@ -1148,6 +1148,11 @@ export default {
     player_segments_value_auto: 'דלג אוטומטית',
     player_segments_value_user: 'מותאם אישית',
     player_segments_skiped: 'קטע דולג',
+    player_segments_skip_now: 'דלג',
+    player_segments_skip_in: 'דילוג בעוד',
+    player_segments_skip_intro: 'דלג על הפתיח',
+    player_segments_next: 'הפרק הבא',
+    player_segments_next_in: 'הפרק הבא בעוד',
     subscribe_info: 'בקטע "מנויים" תוכלו לראות את כל מנויי התרגום שלכם. תקבלו התראה כאשר יצא פרק חדש עם התרגום שבחרתם.',
     no_watch_history: 'אין היסטוריית גלישה',
 

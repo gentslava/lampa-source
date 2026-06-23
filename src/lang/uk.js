@@ -1229,6 +1229,11 @@ export default {
     player_segments_value_auto: 'Автоматично пропускати',
     player_segments_value_user: 'Користувацький',
     player_segments_skiped: 'Сегмент пропущено',
+    player_segments_skip_now: 'Пропустити',
+    player_segments_skip_in: 'Пропуск через',
+    player_segments_skip_intro: 'Пропустити заставку',
+    player_segments_next: 'Наступна серія',
+    player_segments_next_in: 'Наступна серія через',
     subscribe_info: 'У розділі «Підписки» ви побачите всі свої підписки на переклади. Ви отримаєте сповіщення, коли вийде нова серія з вибраним перекладом.',
     no_watch_history: 'Немає історії перегляду',
 

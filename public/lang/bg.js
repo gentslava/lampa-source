@@ -1255,6 +1255,11 @@ export default {
     player_segments_value_auto: 'Автоматично прескачане',
     player_segments_value_user: 'Персонализирано',
     player_segments_skiped: 'Сегментът е пропуснат',
+    player_segments_skip_now: 'Прескочи',
+    player_segments_skip_in: 'Прескачане след',
+    player_segments_skip_intro: 'Пропусни въведението',
+    player_segments_next: 'Следващ епизод',
+    player_segments_next_in: 'Следващ епизод след',
     subscribe_info: 'В раздела „Абонаменти“ ще видите всички ваши абонаменти за преводи. Ще получите известие, когато излезе нов епизод с избрания от вас превод.',
     no_watch_history: 'Няма история на сърфиране',
 
