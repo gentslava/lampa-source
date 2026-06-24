@@ -154,7 +154,7 @@ export default {
     settings_player_type: 'Tip player',
     settings_player_type_descr: 'Ce player să fie folosit',
     settings_infuse_launch_mode: 'Lansare în Infuse',
-    settings_infuse_launch_mode_descr: 'Ce să facă la deschiderea videoclipului în Infuse. Torrent: Salvează și redă doar adaugă în bibliotecă',
+    settings_infuse_launch_mode_descr: 'Ce să facă la deschiderea videoclipului în Infuse. Torrentele redau imediat',
     settings_infuse_launch_ask: 'Întreabă la lansare',
     settings_infuse_launch_play: 'Redă',
     settings_infuse_launch_save_and_play: 'Salvează și redă',

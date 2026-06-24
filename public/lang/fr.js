@@ -154,7 +154,7 @@ export default {
     settings_player_type: 'Type de lecteur',
     settings_player_type_descr: 'Choisir le lecteur par défaut',
     settings_infuse_launch_mode: 'Lancement dans Infuse',
-    settings_infuse_launch_mode_descr: 'Action à l\'ouverture d\'une vidéo dans Infuse. Torrent : Enregistrer et lire ajoute uniquement à la bibliothèque',
+    settings_infuse_launch_mode_descr: 'Action à l\'ouverture d\'une vidéo dans Infuse. Les torrents sont toujours lus immédiatement',
     settings_infuse_launch_ask: 'Demander au lancement',
     settings_infuse_launch_play: 'Lire',
     settings_infuse_launch_save_and_play: 'Enregistrer et lire',

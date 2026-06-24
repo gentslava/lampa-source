@@ -154,7 +154,7 @@ export default {
     settings_player_type: 'Player type',
     settings_player_type_descr: 'Which player to play',
     settings_infuse_launch_mode: 'Launch in Infuse',
-    settings_infuse_launch_mode_descr: 'What to do when opening video in Infuse. Torrents: Save and play only adds to library',
+    settings_infuse_launch_mode_descr: 'What to do when opening video in Infuse. Torrents always play immediately',
     settings_infuse_launch_ask: 'Ask on launch',
     settings_infuse_launch_play: 'Play',
     settings_infuse_launch_save_and_play: 'Save and play',

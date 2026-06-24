@@ -189,7 +189,7 @@ export default {
     settings_player_type:  'Typ odtwarzacza',
     settings_player_type_descr:  'Którego odtwarzacza używać do odtwarzania wideo',
     settings_infuse_launch_mode:  'Uruchamianie w Infuse',
-    settings_infuse_launch_mode_descr:  'Co robić przy otwieraniu wideo w Infuse. Torrent: Zapisz i odtwórz tylko dodaje do biblioteki',
+    settings_infuse_launch_mode_descr:  'Co robić przy otwieraniu wideo w Infuse. Torrenty zawsze odtwarzane od razu',
     settings_infuse_launch_ask:  'Pytaj przy uruchomieniu',
     settings_infuse_launch_play:  'Odtwórz',
     settings_infuse_launch_save_and_play:  'Zapisz i odtwórz',

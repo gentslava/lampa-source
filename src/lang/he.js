@@ -140,7 +140,7 @@ export default {
     settings_player_type: 'סוג שחקן',
     settings_player_type_descr: 'VOD בחר סוג נגן',
     settings_infuse_launch_mode: 'הפעלה ב-Infuse',
-    settings_infuse_launch_mode_descr: 'מה לעשות בפתיחת וידאו ב-Infuse. טורנט: שמור והשמע מוסיף לספרייה בלבד',
+    settings_infuse_launch_mode_descr: 'מה לעשות בפתיחת וידאו ב-Infuse. טורנטים תמיד מתחילים מיד',
     settings_infuse_launch_ask: 'שאל בהפעלה',
     settings_infuse_launch_play: 'השמע',
     settings_infuse_launch_save_and_play: 'שמור והשמע',

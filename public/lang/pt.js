@@ -152,7 +152,7 @@ export default {
 	settings_player_type: 'Tipo player',
     settings_player_type_descr: 'Qual o player a utilizar',
     settings_infuse_launch_mode: 'Iniciar no Infuse',
-    settings_infuse_launch_mode_descr: 'O que fazer ao abrir vídeo no Infuse. Torrent: Guardar e reproduzir apenas adiciona à biblioteca',
+    settings_infuse_launch_mode_descr: 'O que fazer ao abrir vídeo no Infuse. Torrents sempre reproduzem imediatamente',
     settings_infuse_launch_ask: 'Perguntar ao iniciar',
     settings_infuse_launch_play: 'Reproduzir',
     settings_infuse_launch_save_and_play: 'Guardar e reproduzir',

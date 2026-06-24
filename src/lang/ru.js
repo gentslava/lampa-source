@@ -189,7 +189,7 @@ export default {
     settings_player_type: 'Тип плеера',
     settings_player_type_descr: 'Каким плеером воспроизводить видео',
     settings_infuse_launch_mode: 'Запуск в Infuse',
-    settings_infuse_launch_mode_descr: 'Что делать при открытии видео в Infuse. Торрент: «Сохранить и играть» — только в библиотеку',
+    settings_infuse_launch_mode_descr: 'Что делать при открытии видео в Infuse. Для торрентов всегда сразу воспроизведение',
     settings_infuse_launch_ask: 'Спрашивать при запуске',
     settings_infuse_launch_play: 'Играть',
     settings_infuse_launch_save_and_play: 'Сохранить и играть',

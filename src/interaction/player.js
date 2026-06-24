@@ -871,8 +871,8 @@ function externalPlayer(player_need, data, players, infuseCallbacks){
     let url      = encodeURIComponent(data.url.replace('&preload','&play'))
     let _url     = encodeURI(data.url.replace('&preload','&play'))
     let furl     = data.url.replace('&preload','&play')
-    let playlist = InfusePlayer.serializePlaylist(data.playlist)
-    let segments = InfusePlayer.serializeJson(data.segments)
+    let playlist = data.playlist ? encodeURIComponent(JSON.stringify(data.playlist)) : ''
+    let segments = data.segments ? encodeURIComponent(JSON.stringify(data.segments)) : ''
 
     for(let p in players){
         players[p] = players[p].replace('${url}', url).replace('${_url}', _url).replace('${furl}', furl).replace('${playlist}', playlist).replace('${segments}', segments)
@@ -892,7 +892,7 @@ function externalPlayer(player_need, data, players, infuseCallbacks){
 
         if(customUrl) return customUrl
 
-        return InfusePlayer.resolveUrl(data, infuseCallbacks)
+        return InfusePlayer.resolveUrl(data, infuseCallbacks) || players.infuse
     }
 
     return players[player]
@@ -961,6 +961,12 @@ function showInnerPlayerDisclaimer(call){
 
 function prepareInfuseLaunch(data, player_need, callback, onCancel){
     if(Storage.field(player_need) !== 'infuse') return callback()
+
+    // Торрент + Infuse: всегда play? с position
+    if(InfusePlayer.isTorrentStream(data)){
+        data.infuse_mode = 'play'
+        return callback()
+    }
 
     let setting = Storage.field('infuse_launch_mode') || 'play'
 
@@ -1033,6 +1039,7 @@ function start(data, need, inner){
         launchExternalPlayer(data, player_need, {
             vlc:        'vlc://${furl}',
             nplayer:    'nplayer-${furl}',
+            infuse:     'infuse://x-callback-url/play?url=${url}',
             senplayer:  'senplayer://x-callback-url/play?url=${url}',
             vidhub:     'open-vidhub://x-callback-url/open?&url=${url}',
             svplayer:   'svplayer://x-callback-url/stream?url=${url}',
@@ -1049,12 +1056,16 @@ function start(data, need, inner){
         launchExternalPlayer(data, player_need, {
             mpv:    'mpv://${_url}',
             iina:   'iina://weblink?url=${url}',
-            nplayer:'nplayer-${_url}'
+            nplayer:'nplayer-${_url}',
+            infuse: 'infuse://x-callback-url/play?url=${url}'
         }, null, launchInner)
     }
     else if(Platform.is('apple_tv')){
+        let apple_tv_client = Storage.field('apple_tv_client') ?? 'lampa'
+
         launchExternalPlayer(data, player_need, {
             vlc:        'vlc-x-callback://x-callback-url/stream?url=${url}',
+            infuse:     `infuse://x-callback-url/play?x-success=${apple_tv_client}://infuseDidFinish&x-error=${apple_tv_client}://infuseDidFail&url=\${url}&playlist=\${playlist}`,
             senplayer:  'SenPlayer://x-callback-url/play?url=${url}',
             vidhub:     'open-vidhub://x-callback-url/open?url=${url}',
             svplayer:   'svplayer://x-callback-url/stream?url=${url}',

@@ -153,7 +153,7 @@ export default {
     settings_player_type: 'Тып плэера',
     settings_player_type_descr: 'Якім плэерам прайграваць',
     settings_infuse_launch_mode: 'Запуск у Infuse',
-    settings_infuse_launch_mode_descr: 'Што рабіць пры адкрыцці відэа ў Infuse. Торэнт: «Захаваць і гуляць» — толькі ў бібліятэку',
+    settings_infuse_launch_mode_descr: 'Што рабіць пры адкрыцці відэа ў Infuse. Для торэнтаў заўжды адразу прайграванне',
     settings_infuse_launch_ask: 'Пытаць пры запуску',
     settings_infuse_launch_play: 'Гуляць',
     settings_infuse_launch_save_and_play: 'Захаваць і гуляць',

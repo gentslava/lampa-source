@@ -142,7 +142,7 @@ export default {
     settings_player_type: '播放器类型',
     settings_player_type_descr: '用哪个播放器',
     settings_infuse_launch_mode: 'Infuse 启动方式',
-    settings_infuse_launch_mode_descr: '在 Infuse 中打开视频时的操作。种子：保存并播放仅添加到库',
+    settings_infuse_launch_mode_descr: '在 Infuse 中打开视频时的操作。种子始终立即播放',
     settings_infuse_launch_ask: '启动时询问',
     settings_infuse_launch_play: '播放',
     settings_infuse_launch_save_and_play: '保存并播放',
