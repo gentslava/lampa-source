@@ -211,15 +211,40 @@ function mapSegment(seg, duration, is_tail, credit_ref_len, tail_start){
 
 function keepEarlySkip(seg, list){
     let start = seg.start || 0
+    let end   = seg.end || 0
 
     if(start >= 30) return true
 
-    // Один бампер с начала — не дубль метки заставки.
+    // Убираем только дубль заставки: пересечение или «хвост» в зону intro.
     for(let j = 0; j < list.length; j++){
-        if((list[j].start || 0) >= 30) return false
+        let other  = list[j]
+        let oStart = other.start || 0
+
+        if(oStart < 30) continue
+
+        let oEnd = other.end || 0
+
+        if(end > oStart && start < oEnd) return false
+        if(end > oStart + 15) return false
     }
 
     return true
+}
+
+function shouldKeepSkipSegment(seg, list, anchor){
+    let start = seg.start || 0
+    let end   = seg.end || 0
+
+    if(!keepEarlySkip(seg, list)) return false
+
+    if(end >= ref_duration - 60) return true
+
+    if(start >= anchor - 1) return true
+
+    // Бампер/лого до заставки — отдельная зона, не дубль intro.
+    if(end <= anchor + 15) return true
+
+    return false
 }
 
 function pruneSkipDuplicates(){
@@ -231,15 +256,7 @@ function pruneSkipDuplicates(){
 
     let anchor = intro.start || 0
 
-    segments.skip = segments.skip.filter((seg)=>{
-        let start = seg.start || 0
-
-        if(!keepEarlySkip(seg, segments.skip)) return false
-
-        if((seg.end || 0) >= ref_duration - 60) return true
-
-        return start >= anchor - 1
-    })
+    segments.skip = segments.skip.filter((seg)=> shouldKeepSkipSegment(seg, segments.skip, anchor))
 }
 
 function skipSegmentsUi(){
@@ -251,16 +268,7 @@ function skipSegmentsUi(){
 
     let anchor = intro.start || 0
 
-  // Не показывать skip на ранних дублях — только заставка и титры.
-    return segments.skip.filter((seg)=>{
-        let start = seg.start || 0
-
-        if(!keepEarlySkip(seg, segments.skip)) return false
-
-        if((seg.end || 0) >= ref_duration - 60) return true
-
-        return start >= anchor - 1
-    })
+    return segments.skip.filter((seg)=> shouldKeepSkipSegment(seg, segments.skip, anchor))
 }
 
 function scanSkip(time, lead, preview){
