@@ -43,6 +43,7 @@ function component(object){
         },
         onBuild: function(text){
             try{
+                console.log('ffff', text)
                 this.body.html(Utils.simpleMarkdownParser(text))
 
                 this.body.find('h1').remove()
